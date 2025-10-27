@@ -1,25 +1,33 @@
 package cfgstore
 
+import (
+	"github.com/mikeschinkel/go-dt/appinfo"
+)
+
 type ConfigStoreMap map[DirType]ConfigStore
 
 type ConfigStores struct {
 	DirTypes []DirType
 	StoreMap ConfigStoreMap
 }
+type ConfigStoreArgs struct {
+	appinfo.AppInfo
+	DirTypes []DirType
+}
 
-func NewConfigStores(info AppInfo) (css *ConfigStores) {
-	if len(info.DirTypes) == 0 {
-		info.DirTypes = []DirType{
+func NewConfigStores(args ConfigStoreArgs) (css *ConfigStores) {
+	if len(args.DirTypes) == 0 {
+		args.DirTypes = []DirType{
 			DotConfigDir,
 			LocalConfigDir,
 		}
 	}
 	css = &ConfigStores{
-		DirTypes: info.DirTypes,
-		StoreMap: make(ConfigStoreMap, len(info.DirTypes)),
+		DirTypes: args.DirTypes,
+		StoreMap: make(ConfigStoreMap, len(args.DirTypes)),
 	}
-	for _, dirType := range info.DirTypes {
-		css.StoreMap[dirType] = NewConfigStore(info).WithDirType(dirType)
+	for _, dirType := range args.DirTypes {
+		css.StoreMap[dirType] = NewConfigStore(args).WithDirType(dirType)
 	}
 	return css
 }
@@ -29,13 +37,18 @@ func (stores *ConfigStores) LastStore() (cs ConfigStore) {
 	return stores.StoreMap[stores.DirTypes[len(stores.DirTypes)-1]].(*configStore)
 }
 
+type RootConfigArgs struct {
+	DirTypes []DirType
+	Options  Options
+}
+
 // LoadRootConfig also specifying the config stores in a map to enable unit testing
-func (stores *ConfigStores) LoadRootConfig(rc RootConfig, info AppInfo) (err error) {
+func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (err error) {
 	var cs *configStore
 	var errs []error
 
-	if len(info.DirTypes) == 0 {
-		info.DirTypes = []DirType{
+	if len(args.DirTypes) == 0 {
+		args.DirTypes = []DirType{
 			DotConfigDir,
 			LocalConfigDir,
 		}
@@ -43,7 +56,7 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, info AppInfo) (err err
 
 	for _, store := range stores.StoreMap {
 		cs := store.(*configStore)
-		err = cs.ensureConfig(rc, info.Options)
+		err = cs.ensureConfig(rc, args.Options)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -53,7 +66,7 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, info AppInfo) (err err
 	// TODO Merge them here instead of just returning LastStore
 
 	cs = stores.LastStore().(*configStore)
-	err = cs.loadConfigIfExists(rc, info.Options)
+	err = cs.loadConfigIfExists(rc, args.Options)
 	if err != nil {
 		goto end
 	}

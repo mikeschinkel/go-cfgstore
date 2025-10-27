@@ -4,7 +4,7 @@ go 1.25.3
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/mikeschinkel/go-dt v0.0.0-00010101000000-000000000000
+	github.com/mikeschinkel/go-dt v0.0.0-20251027170931-0f47f0479185
 	github.com/mikeschinkel/go-fsfix v0.1.0
 	github.com/mikeschinkel/go-testutil v0.0.0
 	github.com/stretchr/testify v1.11.1
@@ -18,7 +18,7 @@ require (
 )
 
 replace (
-	 github.com/mikeschinkel/go-cliutil => ../go-cliutil
+	github.com/mikeschinkel/go-cliutil => ../go-cliutil
 	github.com/mikeschinkel/go-dt => ../go-dt
 	github.com/mikeschinkel/go-fsfix => ../go-fsfix
 	github.com/mikeschinkel/go-testutil => ../go-testutil

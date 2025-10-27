@@ -96,16 +96,16 @@ end:
 	return err
 }
 
-func (cs *configStore) Create(info AppInfo) ConfigStore {
-	ncs := NewConfigStore(info)
-	ncs.SetRelFilepath(info.RootConfigFile)
+func (cs *configStore) Create(args ConfigStoreArgs) ConfigStore {
+	ncs := NewConfigStore(args)
+	ncs.SetRelFilepath(args.ConfigFile())
 	return ncs
 }
 
-func NewConfigStore(info AppInfo) ConfigStore {
+func NewConfigStore(args ConfigStoreArgs) ConfigStore {
 	return &configStore{
-		appConfigSubdir: info.AppConfigSubdir,
-		relFilepath:     info.RootConfigFile,
+		appConfigSubdir: args.ConfigDir(),
+		relFilepath:     args.ConfigFile(),
 		dirType:         DotConfigDir,
 	}
 }

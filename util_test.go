@@ -4,18 +4,15 @@ import (
 	"testing"
 
 	"github.com/mikeschinkel/go-cfgstore"
-	"github.com/mikeschinkel/go-dt"
+	"github.com/mikeschinkel/go-dt/appinfo"
 	"github.com/mikeschinkel/go-fsfix"
 
 	"github.com/mikeschinkel/go-testutil"
 )
 
 type ConfigDirFixturesArgs struct {
-	TestDataDir       dt.DirPath
-	AppConfigSubdir   dt.PathSegments
-	RootConfigFile    dt.Filename
-	UserConfigFile    dt.Filepath
-	ProjectConfigFile dt.Filepath
+	appinfo.AppInfo
+	DirTypes []cfgstore.DirType
 }
 
 // SetupConfigDirFixtures sets up a root fixture with two dir fixtures, one to
@@ -27,9 +24,10 @@ func SetupConfigDirFixtures(t *testing.T, testDataDir, userFile, projectFile str
 		userDir    = ".config"
 		projectDir = "project"
 	)
-	css = cfgstore.NewConfigStores(cfgstore.AppInfo{
-		AppConfigSubdir: args.AppConfigSubdir,
-		RootConfigFile:  args.RootConfigFile,
+	configFile := args.ConfigFile()
+	css = cfgstore.NewConfigStores(cfgstore.ConfigStoreArgs{
+		AppInfo:  args.AppInfo,
+		DirTypes: args.DirTypes,
 	})
 	dotCS := css.StoreMap[cfgstore.DefaultConfigDirType]
 	localCS := css.StoreMap[cfgstore.LocalConfigDir]
@@ -37,14 +35,14 @@ func SetupConfigDirFixtures(t *testing.T, testDataDir, userFile, projectFile str
 	rootFix = fsfix.NewRootFixture("config")
 
 	dotFix := rootFix.AddDirFixture(t, userDir, &fsfix.DirFixtureArgs{Parent: rootFix})
-	dotFix.AddFileFixture(t, args.RootConfigFile, &fsfix.FileFixtureArgs{
-		Name:    args.RootConfigFile,
+	dotFix.AddFileFixture(t, configFile, &fsfix.FileFixtureArgs{
+		Name:    configFile,
 		Content: string(testutil.LoadFile(t, userFile, true)),
 	})
 
 	localFix := rootFix.AddDirFixture(t, projectDir, &fsfix.DirFixtureArgs{Parent: rootFix})
-	localFix.AddFileFixture(t, args.RootConfigFile, &fsfix.FileFixtureArgs{
-		Name:    args.RootConfigFile,
+	localFix.AddFileFixture(t, configFile, &fsfix.FileFixtureArgs{
+		Name:    configFile,
 		Content: string(testutil.LoadFile(t, projectFile, true)),
 	})
 

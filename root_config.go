@@ -8,7 +8,3 @@ type RootConfig interface {
 	RootConfig()
 	Normalize(dt.Filepath, Options)
 }
-
-type RootConfigArgs struct {
-	Options Options
-}

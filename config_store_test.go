@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mikeschinkel/go-cfgstore"
 	"github.com/mikeschinkel/go-dt"
+	"github.com/mikeschinkel/go-dt/appinfo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,12 +17,20 @@ type testData struct {
 	Age  int
 }
 
-func getConfigStore(fp dt.Filename, dirType cfgstore.DirType) cfgstore.ConfigStore {
-	info := cfgstore.NewAppInfo(cfgstore.AppInfoArgs{
-		AppConfigSubdir: "test-app",
-		RootConfigFile:  fp,
-	})
-	return cfgstore.NewConfigStore(info).WithDirType(dirType).(cfgstore.ConfigStore)
+func getConfigStore(fp dt.RelFilepath, dirType cfgstore.DirType) cfgstore.ConfigStore {
+	args := cfgstore.ConfigStoreArgs{
+		AppInfo: appinfo.New(appinfo.Args{
+			AppName:    "",
+			AppDescr:   "",
+			AppVer:     "",
+			AppSlug:    "",
+			ConfigDir:  "test-app",
+			ConfigFile: fp,
+			ExeName:    "",
+			InfoURL:    "",
+		}),
+	}
+	return cfgstore.NewConfigStore(args).WithDirType(dirType).(cfgstore.ConfigStore)
 }
 
 func TestConfigStore_SaveLoadExists(t *testing.T) {

@@ -3,19 +3,20 @@ package cfgstore
 import (
 	"encoding/json/jsontext"
 	jsonv2 "encoding/json/v2"
-	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 
 	"github.com/mikeschinkel/go-dt"
+	"github.com/mikeschinkel/go-dt/de"
 )
 
 // DefaultConfigDirType is currently hardcoded for ~/.config but having this
 // const will make it easy to track down how where to change it if we want to make it
 // configurable.
-const DefaultConfigDirType = DotConfigDir
+const DefaultConfigDirType = CLIConfigDir
 
-const ConfigBaseDirName = ".config"
+const DotConfigPathSegment dt.PathSegment = ".config"
 
 // ConfigStore provides file operations for Gmail APIConfig
 type ConfigStore interface {
@@ -25,155 +26,156 @@ type ConfigStore interface {
 	SaveJSON(data any) error
 	Exists() bool
 	GetFilepath() (dt.Filepath, error)
+	GetRelFilepath() dt.RelFilepath
 	SetRelFilepath(dt.RelFilepath)
 	SetConfigDir(dt.DirPath)
 	ConfigDir() (dt.DirPath, error)
 	WithDirType(DirType) ConfigStore
+	DirType() DirType
 	ConfigStore()
+	ConfigSlug() dt.PathSegment
+	IsNil() bool
 }
 
 var _ ConfigStore = (*configStore)(nil)
 
 type configStore struct {
-	appConfigSubdir dt.PathSegments
-	configDir       dt.DirPath
-	relFilepath     dt.RelFilepath
-	dirType         DirType
-	fs              fs.FS
+	configSlug dt.PathSegment
+	// parentDir is <projectDir> ot Getwd() for ProjectConfig,
+	// or ~/.config for CLIConfigStore
+	// or UserConfigDir() for StdConfig
+	configDir    dt.DirPath
+	relFilepath  dt.RelFilepath
+	dirType      DirType
+	dirsProvider *DirsProvider
+	fs           fs.FS
 }
 
-func (cs *configStore) ConfigStore() {}
+type ConfigStoreArgs struct {
+	// ConfigSlug is the single path segment used for ~/.config/<slug>
+	ConfigSlug dt.PathSegment
 
-func (cs *configStore) ensureConfig(rc RootConfig, opts Options) (err error) {
-	err = cs.loadConfigIfExists(rc, opts)
-	if err != nil {
-		// A real error occurred, bail out
-		goto end
-	}
+	// RelFilepath is the filename to be used for a file in the config directory which
+	// may optionally include one or more parent paths but should not be an absolute
+	// path.
+	RelFilepath dt.RelFilepath
 
-	if rc == nil {
-		// Config not loaded, need to create config
-		err = cs.createConfig(rc, opts)
-		goto end
-	}
-
-end:
-	return err
+	// DirsProvider is typically never used for production code. It is intended only
+	// to be used for test code in conjunction with go-the fsfix package
+	DirsProvider *DirsProvider
 }
 
-var fp dt.Filepath
-
-func (cs *configStore) createConfig(rc RootConfig, opts Options) (err error) {
-	fp, err = cs.GetFilepath()
-	if err != nil {
-		goto end
-	}
-	rc.Normalize(fp, opts)
-	err = cs.SaveJSON(rc)
-	if err != nil {
-		goto end
-	}
-end:
-	return err
+func NewCLIConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath) ConfigStore {
+	return NewConfigStore(CLIConfigDir, ConfigStoreArgs{
+		ConfigSlug:  configSlug,
+		RelFilepath: configFile,
+	})
 }
 
-func (cs *configStore) loadConfigIfExists(rc RootConfig, opts Options) (err error) {
-	var fp dt.Filepath
-	if !cs.Exists() {
-		goto end
-	}
-
-	err = cs.LoadJSON(rc, nil)
-	if err != nil {
-		goto end
-	}
-	fp, err = cs.GetFilepath()
-	if err != nil {
-		goto end
-	}
-	rc.Normalize(fp, opts)
-end:
-	return err
+func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath) ConfigStore {
+	return NewConfigStore(ProjectConfigDir, ConfigStoreArgs{
+		ConfigSlug:  configSlug,
+		RelFilepath: configFile,
+	})
 }
 
-func (cs *configStore) Create(args ConfigStoreArgs) ConfigStore {
-	ncs := NewConfigStore(args)
-	ncs.SetRelFilepath(args.ConfigFile())
-	return ncs
-}
-
-func NewConfigStore(args ConfigStoreArgs) ConfigStore {
+func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
+	if dirType == UnspecifiedConfigDir {
+		panic("NewConfigStore: DirType is Unspecified")
+	}
+	if args.DirsProvider == nil {
+		args.DirsProvider = &DirsProvider{
+			UserHomeDirFunc:   dt.UserHomeDir,
+			UserConfigDirFunc: dt.UserConfigDir,
+			GetwdFunc:         dt.Getwd,
+			ProjectDirFunc: func() (dt.DirPath, error) {
+				return dt.Getwd()
+			},
+		}
+	}
 	return &configStore{
-		appConfigSubdir: args.ConfigDir(),
-		relFilepath:     args.ConfigFile(),
-		dirType:         DotConfigDir,
+		dirType:      dirType,
+		configSlug:   args.ConfigSlug,
+		relFilepath:  args.RelFilepath,
+		dirsProvider: args.DirsProvider,
 	}
+}
+
+func RootRelative(p string) (string, error) {
+
+	vol := filepath.VolumeName(p) // "C:" or "\\server\\share"
+	if vol == "" {                // not a rooted Windows path
+		return p, nil
+	}
+	base := vol + string(os.PathSeparator) // "C:\" or "\\server\\share\"
+	rel, err := filepath.Rel(base, p)      // strip the volume root
+	if err != nil {
+		return "", err
+	}
+	if rel == "." { // exactly the root
+		return "", nil
+	}
+	return rel, nil
 }
 
 func (cs *configStore) ConfigDir() (dir dt.DirPath, err error) {
 	if cs.configDir != "" {
 		goto end
 	}
-	switch cs.dirType {
-	case DotConfigDir:
-		dir, err = dt.UserHomeDir()
-		if err != nil {
-			goto end
-		}
-		cs.configDir = dt.DirPathJoin3(dir, ConfigBaseDirName, cs.appConfigSubdir)
-	case LocalConfigDir:
-		dir, err = dt.Getwd()
-		if err != nil {
-			goto end
-		}
-		cs.configDir = dt.DirPathJoin(dir, "."+cs.appConfigSubdir)
-	case GoUserConfigDir:
-		dir, err = dt.UserConfigDir()
-		if err != nil {
-			goto end
-		}
-		cs.configDir = dt.DirPathJoin(dir, cs.appConfigSubdir)
-	case UnspecifiedConfigDir:
-		err = fmt.Errorf("config dir type not set")
-	default:
-		err = fmt.Errorf("invalid config dir type: %d", cs.dirType)
-	}
+	{
+		dp := cs.dirsProvider
+		switch cs.dirType {
+		case CLIConfigDir:
+			dir, err = dp.UserHomeDirFunc()
+			if err != nil {
+				err = NewErr(ErrFailedGettingUserHomeDir, err)
+				goto end
+			}
+			cs.configDir = dt.DirPathJoin3(dir, DotConfigPathSegment, cs.configSlug)
 
+		case ProjectConfigDir:
+			dir, err = dp.ProjectDirFunc()
+			if err != nil {
+				err = NewErr(ErrFailedGettingWorkingDir, err)
+				goto end
+			}
+			cs.configDir = dt.DirPathJoin(dir, "."+cs.configSlug)
+
+		case AppConfigDir:
+			dir, err = dp.UserConfigDirFunc()
+			if err != nil {
+				err = NewErr(ErrFailedGettingUserConfigDir, err)
+				goto end
+			}
+			cs.configDir = dt.DirPathJoin(dir, cs.configSlug)
+
+		case UnspecifiedConfigDir:
+			err = NewErr(ErrConfigDirTypeNotSet)
+			goto end
+		default:
+			err = NewErr(
+				ErrInvalidConfigDirType,
+				"config_dir_type", cs.dirType,
+			)
+			goto end
+		}
+	}
 end:
 	return cs.configDir, err
 }
 
-func (cs *configStore) getFS() (_ fs.FS, err error) {
-	var dir dt.DirPath
+func (cs *configStore) ConfigStore() {}
 
-	if cs.fs != nil {
-		goto end
-	}
-
-	dir, err = cs.ConfigDir()
-	if err != nil {
-		goto end
-	}
-
-	cs.fs = dt.DirFS(dir)
-
-end:
-	return cs.fs, err
-}
-
-func (cs *configStore) ensureFilepath() (fp dt.Filepath, err error) {
-	fp, err = cs.GetFilepath()
-	// This is needed in case filepath contains a subdirectory, e.g. tokens/token-bill@microsoft.com.json
-	err = dt.MkdirAll(dt.Dir(fp), 0755)
-	if err != nil {
-		goto end
-	}
-end:
-	return fp, err
+func (cs *configStore) ConfigPath() dt.PathSegment {
+	return cs.configSlug
 }
 
 func (cs *configStore) SetRelFilepath(rf dt.RelFilepath) {
 	cs.relFilepath = rf
+}
+
+func (cs *configStore) GetRelFilepath() dt.RelFilepath {
+	return cs.relFilepath
 }
 
 func (cs *configStore) GetFilepath() (fp dt.Filepath, err error) {
@@ -184,12 +186,16 @@ func (cs *configStore) GetFilepath() (fp dt.Filepath, err error) {
 		goto end
 	}
 
-	if !dt.ValidRelPath(cs.relFilepath) {
-		err = fmt.Errorf("path %s is not valid for use in %s", cs.relFilepath, dir)
+	if !cs.relFilepath.ValidPath() {
+		err = NewErr(
+			de.ErrInvalid,
+			dt.ErrInvalidForOpen,
+			"filepath", cs.relFilepath,
+		)
 		goto end
 	}
 
-	fp = dt.FilepathJoin(cs.configDir, cs.relFilepath)
+	fp = dt.FilepathJoin(dir, cs.relFilepath)
 
 end:
 	return fp, err
@@ -240,7 +246,7 @@ func (cs *configStore) Load() (data []byte, err error) {
 		goto end
 	}
 
-	data, err = dt.FSReadFile(fSys, dt.Filepath(cs.relFilepath))
+	data, err = cs.relFilepath.ReadFile(fSys)
 	if NoSuchFileOrDirectory(err) {
 		err = NewErr(ErrFileDoesNotExist, err)
 	}
@@ -277,7 +283,7 @@ func (cs *configStore) Exists() (exists bool) {
 	if err != nil {
 		goto end
 	}
-	_, err = dt.FSStatFile(fSys, dt.Filepath(cs.relFilepath))
+	_, err = cs.relFilepath.Stat(fSys)
 	exists = err == nil
 
 end:
@@ -294,4 +300,111 @@ func (cs *configStore) WithDirType(dt DirType) ConfigStore {
 	store := *cs
 	store.dirType = dt
 	return &store
+}
+
+func (cs *configStore) DirType() DirType {
+	return cs.dirType
+}
+
+func (cs *configStore) ConfigSlug() dt.PathSegment {
+	return cs.configSlug
+}
+
+func (cs *configStore) IsNil() bool {
+	return cs == nil
+}
+
+func (cs *configStore) ensureConfig(rc RootConfig, opts Options) (err error) {
+	err = cs.loadConfigIfExists(rc, opts)
+	if err != nil {
+		// A real error occurred, bail out
+		goto end
+	}
+
+	if rc.IsNil() {
+		// Config not loaded, need to create config
+		err = cs.createConfig(rc, opts)
+		goto end
+	}
+
+end:
+	return err
+}
+
+func (cs *configStore) createConfig(rc RootConfig, opts Options) (err error) {
+	var fp dt.Filepath
+	fp, err = cs.GetFilepath()
+	if err != nil {
+		goto end
+	}
+	err = rc.Normalize(fp, opts)
+	if err != nil {
+		goto end
+	}
+	err = cs.SaveJSON(rc)
+	if err != nil {
+		goto end
+	}
+end:
+	return err
+}
+
+func (cs *configStore) loadConfigIfExists(rc RootConfig, opts Options) (err error) {
+	var fp dt.Filepath
+	if !cs.Exists() {
+		goto end
+	}
+
+	err = cs.LoadJSON(rc, nil)
+	if err != nil {
+		err = NewErr(err)
+		goto end
+	}
+	fp, err = cs.GetFilepath()
+	if err != nil {
+		goto end
+	}
+	err = rc.Normalize(fp, opts)
+	if err != nil {
+		goto end
+	}
+end:
+	if err != nil {
+		err = WithErr(err,
+			"config_file", fp,
+		)
+	}
+	return err
+}
+
+func (cs *configStore) getFS() (_ fs.FS, err error) {
+	var dir dt.DirPath
+
+	if cs.fs != nil {
+		goto end
+	}
+
+	dir, err = cs.ConfigDir()
+	if err != nil {
+		goto end
+	}
+
+	cs.fs = dt.DirFS(dir)
+
+end:
+	return cs.fs, err
+}
+
+func (cs *configStore) ensureFilepath() (fp dt.Filepath, err error) {
+	fp, err = cs.GetFilepath()
+	if err != nil {
+		goto end
+	}
+	// This is needed in case filepath contains a subdirectory, e.g. tokens/token-bill@microsoft.com.json
+	err = fp.Dir().MkdirAll(0755)
+	if err != nil {
+		goto end
+	}
+end:
+	return fp, err
 }

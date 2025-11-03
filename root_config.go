@@ -6,5 +6,6 @@ import (
 
 type RootConfig interface {
 	RootConfig()
-	Normalize(dt.Filepath, Options)
+	Normalize(dt.Filepath, Options) error
+	IsNil() bool
 }

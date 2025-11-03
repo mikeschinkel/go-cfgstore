@@ -1,25 +1,37 @@
 package cfgstore
 
 import (
-	"github.com/mikeschinkel/go-dt/appinfo"
+	"github.com/mikeschinkel/go-dt"
 )
 
 type ConfigStoreMap map[DirType]ConfigStore
 
 type ConfigStores struct {
-	DirTypes []DirType
-	StoreMap ConfigStoreMap
+	DirTypes  []DirType
+	StoreMap  ConfigStoreMap
+	GetwdFunc func() (dt.DirPath, error)
 }
-type ConfigStoreArgs struct {
-	appinfo.AppInfo
+
+func (stores *ConfigStores) CLIConfigStore() (cs ConfigStore) {
+	cs, _ = stores.StoreMap[CLIConfigDir]
+	return cs
+}
+func (stores *ConfigStores) ProjectConfigStore() (cs ConfigStore) {
+	cs, _ = stores.StoreMap[ProjectConfigDir]
+	return cs
+
+}
+
+type ConfigStoresArgs struct {
+	ConfigStoreArgs
 	DirTypes []DirType
 }
 
-func NewConfigStores(args ConfigStoreArgs) (css *ConfigStores) {
+func NewConfigStores(args ConfigStoresArgs) (css *ConfigStores) {
 	if len(args.DirTypes) == 0 {
 		args.DirTypes = []DirType{
-			DotConfigDir,
-			LocalConfigDir,
+			CLIConfigDir,
+			ProjectConfigDir,
 		}
 	}
 	css = &ConfigStores{
@@ -27,14 +39,25 @@ func NewConfigStores(args ConfigStoreArgs) (css *ConfigStores) {
 		StoreMap: make(ConfigStoreMap, len(args.DirTypes)),
 	}
 	for _, dirType := range args.DirTypes {
-		css.StoreMap[dirType] = NewConfigStore(args).WithDirType(dirType)
+		css.StoreMap[dirType] = NewConfigStore(dirType, args.ConfigStoreArgs)
 	}
 	return css
 }
 
 // LastStore returns the store identified by the last element in the DirTypes array
 func (stores *ConfigStores) LastStore() (cs ConfigStore) {
+	if len(stores.DirTypes) == 0 {
+		panic("cfgstore.ConfigStores.LastStore(): No stores found")
+	}
 	return stores.StoreMap[stores.DirTypes[len(stores.DirTypes)-1]].(*configStore)
+}
+
+// FirstStore returns the store identified by the first element in the DirTypes array
+func (stores *ConfigStores) FirstStore() (cs ConfigStore) {
+	if len(stores.DirTypes) == 0 {
+		panic("cfgstore.ConfigStores.FirstStore(): No stores found")
+	}
+	return stores.StoreMap[stores.DirTypes[0]].(*configStore)
 }
 
 type RootConfigArgs struct {
@@ -49,18 +72,26 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (
 
 	if len(args.DirTypes) == 0 {
 		args.DirTypes = []DirType{
-			DotConfigDir,
-			LocalConfigDir,
+			CLIConfigDir,
+			ProjectConfigDir,
 		}
 	}
 
 	for _, store := range stores.StoreMap {
-		cs := store.(*configStore)
+		cs = store.(*configStore)
 		err = cs.ensureConfig(rc, args.Options)
 		if err != nil {
-			errs = append(errs, err)
-			continue
+			fp, _ := cs.GetFilepath()
+			errs = append(errs, NewErr(
+				ErrFailedToEnsureConfig,
+				"filepath", fp,
+				err,
+			))
 		}
+	}
+	err = CombineErrs(errs)
+	if err != nil {
+		goto end
 	}
 
 	// TODO Merge them here instead of just returning LastStore
@@ -68,15 +99,13 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (
 	cs = stores.LastStore().(*configStore)
 	err = cs.loadConfigIfExists(rc, args.Options)
 	if err != nil {
+		err = NewErr(
+			ErrFailedToLoadConfig,
+			err,
+		)
 		goto end
 	}
 
 end:
-	if err != nil {
-		fp, _ := cs.GetFilepath()
-		err = WithErr(err,
-			"filepath", fp,
-		)
-	}
 	return err
 }

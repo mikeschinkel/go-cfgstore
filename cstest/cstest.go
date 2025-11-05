@@ -46,6 +46,7 @@ func GetRelConfigDir(cs cfgstore.ConfigStore, args *TestDirsProviderArgs) (rel d
 	}
 	vol = dir.VolumeName() // "C:" or "\\server\\share"
 	if vol == "" {
+		rel = dt.PathSegments(dir)
 		goto end
 	}
 	base = dt.DirPath(string(vol) + string(os.PathSeparator)) // "C:\" or "\\server\\share\"

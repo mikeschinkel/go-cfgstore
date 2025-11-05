@@ -80,11 +80,11 @@ func NewTestDirsProvider(args *TestDirsProviderArgs) *cfgstore.DirsProvider {
 			return wd, err
 		},
 		ProjectDirFunc: func() (dp dt.DirPath, err error) {
-			dp, err = getTestProjectConfigDir(args)
+			dp, err = getTestProjectDir(args)
 			if err != nil {
 				goto end
 			}
-			dp = args.GetTestRoot(args.ProjectDir)
+			dp = args.GetTestRoot(dp)
 		end:
 			return dp, err
 		},
@@ -100,7 +100,7 @@ func NewTestDirsProvider(args *TestDirsProviderArgs) *cfgstore.DirsProvider {
 	}
 }
 
-func getTestProjectConfigDir(args *TestDirsProviderArgs) (dir dt.DirPath, err error) {
+func getTestProjectDir(args *TestDirsProviderArgs) (dir dt.DirPath, err error) {
 	var homeDir dt.DirPath
 
 	homeDir, err = getTestUserHomeDir(args.Username)

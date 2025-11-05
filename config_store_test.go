@@ -1,7 +1,9 @@
 package cfgstore_test
 
 import (
+	"encoding/json"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/uuid"
@@ -115,6 +117,65 @@ func TestConfigStores_CLIAndProjectStores(t *testing.T) {
 	// Both should be under testRoot
 	assert.Contains(t, string(cliDir), string(testRoot))
 	assert.Contains(t, string(projectDir), string(testRoot))
+}
+
+func TestConfigStore_LoadFromPreCreatedFixture(t *testing.T) {
+	var err error
+
+	// Create temp test root directory
+	testRoot := dtx.TempTestDir(t)
+	defer cfgstore.LogOnError(testRoot.RemoveAll())
+
+	// Setup test configuration
+	username := dt.PathSegment("testuser")
+	configSlug := dt.PathSegment("myapp")
+	configFile := "config.json"
+
+	args := &cstest.TestDirsProviderArgs{
+		Username:   username,
+		ProjectDir: "testproject",
+		ConfigSlug: configSlug,
+		TestRoot:   testRoot,
+	}
+
+	// Manually create the fixture directory structure that TestDirsProvider would use
+	// For CLI config: <testRoot>/Users/<username>/.config/<configSlug>/
+	configDirPath := filepath.Join(string(testRoot), "Users", string(username), ".config", string(configSlug))
+	err = os.MkdirAll(configDirPath, 0755)
+	require.NoError(t, err, "Failed to create config directory")
+
+	// Write a fixture JSON file with known content using standard library
+	expectedData := testData{Name: "Bob", Age: 30}
+	jsonBytes, err := json.Marshal(expectedData)
+	require.NoError(t, err, "Failed to marshal test data")
+
+	fixtureFilePath := filepath.Join(configDirPath, configFile)
+	err = os.WriteFile(fixtureFilePath, jsonBytes, 0644)
+	require.NoError(t, err, "Failed to write fixture file")
+
+	// Verify the file exists using standard library
+	_, err = os.Stat(fixtureFilePath)
+	require.NoError(t, err, "Fixture file should exist at %s", fixtureFilePath)
+
+	// Create ConfigStore with TestDirsProvider pointing to testRoot
+	cs := cfgstore.NewConfigStore(cfgstore.DefaultConfigDirType, cfgstore.ConfigStoreArgs{
+		ConfigSlug:   configSlug,
+		RelFilepath:  dt.RelFilepath(configFile),
+		DirsProvider: cstest.NewTestDirsProvider(args),
+	})
+
+	// Verify ConfigStore sees the correct directory
+	actualConfigDir, err := cs.ConfigDir()
+	require.NoError(t, err, "ConfigStore.ConfigDir() failed")
+	assert.Equal(t, dt.DirPath(configDirPath), actualConfigDir, "ConfigDir should match expected path")
+
+	// Call LoadJSON() to load the pre-created fixture
+	var loaded testData
+	err = cs.LoadJSON(&loaded)
+	require.NoError(t, err, "LoadJSON should successfully load the pre-created fixture")
+
+	// Verify the data loaded correctly
+	assert.Equal(t, expectedData, loaded, "Loaded data should match fixture data")
 }
 
 func cleanupFunc(t *testing.T, cs cfgstore.ConfigStore) func() {

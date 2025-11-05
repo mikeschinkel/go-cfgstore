@@ -127,7 +127,6 @@ func getTestProjectDir(args *TestDirsProviderArgs) (dir dt.DirPath, err error) {
 		}
 		dir = args.ProjectDir
 	}
-	dir = dt.DirPathJoin(dir, "."+args.ConfigSlug)
 end:
 	return dir, err
 }

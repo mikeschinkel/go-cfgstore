@@ -4,18 +4,18 @@ go 1.25.3
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/mikeschinkel/go-dt v0.0.0-20251103083857-4c80f1a95372
-	github.com/mikeschinkel/go-dt/appinfo v0.0.0-20251103083857-4c80f1a95372
-	github.com/mikeschinkel/go-dt/de v0.0.0-20251105205054-ffc9ac577d7f
-	github.com/mikeschinkel/go-dt/dtx v0.0.0-20251103083857-4c80f1a95372
+	github.com/mikeschinkel/go-dt v0.0.0-20251105233453-a7985f775567
+	github.com/mikeschinkel/go-dt/appinfo v0.0.0-20251106125543-42540c8e051a
+	github.com/mikeschinkel/go-dt/de v0.0.0-20251105233453-a7985f775567
+	github.com/mikeschinkel/go-dt/dtx v0.0.0-20251106125543-42540c8e051a
 	github.com/mikeschinkel/go-fsfix v0.1.0
-	github.com/mikeschinkel/go-testutil v0.0.0
+	github.com/mikeschinkel/go-testutil v0.0.0-20251106130119-1afd5a012dc6
 	github.com/stretchr/testify v1.11.1
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/mikeschinkel/go-cliutil v0.0.0-20251103044509-f4857eae9f54 // indirect
+	github.com/mikeschinkel/go-cliutil v0.0.0-20251105231813-8ce963ade5dd // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

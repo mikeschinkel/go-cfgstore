@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/mikeschinkel/go-dt v0.0.0-20251103083857-4c80f1a95372
 	github.com/mikeschinkel/go-dt/appinfo v0.0.0-20251103083857-4c80f1a95372
-	github.com/mikeschinkel/go-dt/de v0.0.0-20251103083857-4c80f1a95372
+	github.com/mikeschinkel/go-dt/de v0.0.0-20251105205054-ffc9ac577d7f
 	github.com/mikeschinkel/go-dt/dtx v0.0.0-20251103083857-4c80f1a95372
 	github.com/mikeschinkel/go-fsfix v0.1.0
 	github.com/mikeschinkel/go-testutil v0.0.0

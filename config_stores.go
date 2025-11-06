@@ -94,9 +94,9 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (
 		goto end
 	}
 
-	// TODO Merge them here instead of just returning LastStore
+	// TODO Merge them here instead of just returning FirstStore
 
-	cs = stores.LastStore().(*configStore)
+	cs = stores.FirstStore().(*configStore)
 	err = cs.loadConfigIfExists(rc, args.Options)
 	if err != nil {
 		err = NewErr(

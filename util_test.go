@@ -68,9 +68,8 @@ func SetupConfigDirFixtures(t *testing.T, testDataDir dt.DirPath, userFile, proj
 		t.Fatal(err)
 	}
 
-	cliFix := rootFix.AddDirFixture(t, cliDir, &fsfix.DirFixtureArgs{Parent: rootFix})
+	cliFix := rootFix.AddDirFixture(t, cliDir, nil)
 	cliFix.AddFileFixture(t, configFile, &fsfix.FileFixtureArgs{
-		Name:    configFile,
 		Content: string(testutil.LoadFile(t, userFile, true)),
 	})
 
@@ -80,16 +79,15 @@ func SetupConfigDirFixtures(t *testing.T, testDataDir dt.DirPath, userFile, proj
 		t.Fatal(err)
 	}
 
-	projectFix := rootFix.AddDirFixture(t, projectDir, &fsfix.DirFixtureArgs{Parent: rootFix})
+	projectFix := rootFix.AddDirFixture(t, projectDir, nil)
 	projectFix.AddFileFixture(t, configFile, &fsfix.FileFixtureArgs{
-		Name:    configFile,
 		Content: string(testutil.LoadFile(t, projectFile, true)),
 	})
 
 	rootFix.Create(t)
 
-	//dotCS.SetConfigDir(cliFix.Dir())
-	//projectStore.SetConfigDir(projectFix.Dir())
+	css.CLIConfigStore().SetConfigDir(cliFix.Dir())
+	css.ProjectConfigStore().SetConfigDir(projectFix.Dir())
 
 	return rootFix, css
 }

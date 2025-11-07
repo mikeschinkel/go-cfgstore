@@ -493,6 +493,10 @@ func extractTrailingCause(parts []any) (error, []any) {
 	return lastErr, parts[:lastIdx]
 }
 
+var onNoSentinel = func() {
+	panic("Missing required sentinel error doterr.NewErr() requires at least one sentinel error")
+}
+
 // validateNewParts validates that parts conforms to the expected pattern for NewErr:
 //   - At least one sentinel error (required)
 //   - Then zero or more KV or string key-value pairs
@@ -501,10 +505,7 @@ func extractTrailingCause(parts []any) (error, []any) {
 func validateNewParts(parts []any) error {
 	if len(parts) == 0 {
 		// Build entry manually to avoid recursion
-		e := newEntry([]error{ErrMissingSentinel}, []kv{
-			{k: "message", v: "doterr.New requires at least one sentinel error"},
-		})
-		return e
+		onNoSentinel()
 	}
 
 	// Find where sentinels end (first non-error)
@@ -522,10 +523,7 @@ func validateNewParts(parts []any) error {
 	// Must have at least one sentinel
 	if sentinelCount == 0 {
 		// Build entry manually to avoid recursion
-		e := newEntry([]error{ErrMissingSentinel}, []kv{
-			{k: "message", v: "doterr.New requires at least one sentinel error as the first argument"},
-		})
-		return e
+		onNoSentinel()
 	}
 
 	// Validate remaining args are valid key-value pairs

@@ -21,6 +21,7 @@ var (
 
 var ErrFailedToEnsureConfig = errors.New("failed to ensure config")
 var ErrFailedToLoadConfig = errors.New("failed to load config")
+var ErrFailedToLoadJSON = errors.New("failed to load JSON")
 
 var (
 	ErrUsernameRequired = errors.New("username required")

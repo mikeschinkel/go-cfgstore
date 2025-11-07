@@ -9,6 +9,7 @@ import (
 
 	"github.com/mikeschinkel/go-dt"
 	"github.com/mikeschinkel/go-dt/de"
+	"github.com/mikeschinkel/go-dt/dtx"
 )
 
 // DefaultConfigDirType is currently hardcoded for ~/.config but having this
@@ -263,7 +264,7 @@ func (cs *configStore) LoadJSON(data any, opts ...jsonv2.Options) (err error) {
 	var jsonData []byte
 	jsonData, err = cs.Load()
 	if err != nil {
-		err = WithErr(ErrFailedToReadConfigFile, err)
+		err = NewErr(ErrFailedToReadConfigFile, err)
 		goto end
 	}
 
@@ -275,6 +276,9 @@ func (cs *configStore) LoadJSON(data any, opts ...jsonv2.Options) (err error) {
 	}
 
 end:
+	if err != nil {
+		err = WithErr(err, ErrFailedToLoadJSON)
+	}
 	return err
 }
 
@@ -321,7 +325,7 @@ func (cs *configStore) ensureConfig(rc RootConfig, opts Options) (err error) {
 		goto end
 	}
 
-	if rc.IsNil() {
+	if rc == nil || dtx.IsZero(rc) {
 		// Config not loaded, need to create config
 		err = cs.createConfig(rc, opts)
 		goto end
@@ -355,9 +359,8 @@ func (cs *configStore) loadConfigIfExists(rc RootConfig, opts Options) (err erro
 		goto end
 	}
 
-	err = cs.LoadJSON(rc, nil)
+	err = cs.LoadJSON(rc)
 	if err != nil {
-		err = NewErr(err)
 		goto end
 	}
 	fp, err = cs.GetFilepath()

@@ -244,7 +244,7 @@ Common errors:
 | Go Func           | Directory                                         |
 |-------------------|---------------------------------------------------|
 | `UserHomeDir()`   | `/Users/mikeschinkel`                             |
-| `Getwd()`         | `/Users/mikeschinkel/Projects/xmlui/localdev`     |
+| `Getwd()`         | `/Users/mikeschinkel/Projects/my-project`         |
 | `UserConfigDir()` | `/Users/mikeschinkel/Library/Application Support` |
 | `UserCacheDir()`  | `/Users/mikeschinkel/Library/Caches`              |
 

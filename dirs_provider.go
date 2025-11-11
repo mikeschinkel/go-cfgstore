@@ -11,4 +11,5 @@ type DirsProvider struct {
 	GetwdFunc         DirFunc
 	ProjectDirFunc    DirFunc
 	UserConfigDirFunc DirFunc
+	UserCacheDirFunc  DirFunc
 }

@@ -17,6 +17,7 @@ var (
 	ErrFailedGettingWorkingDir    = errors.New("failed to get working dir")
 	ErrFailedGettingUserConfigDir = errors.New("failed to get user config dir")
 	ErrFailedGettingUserHomeDir   = errors.New("failed to get user home dir")
+	ErrFailedGettingUserCacheDir  = errors.New("failed to get user cache dir")
 )
 
 var ErrFailedToEnsureConfig = errors.New("failed to ensure config")

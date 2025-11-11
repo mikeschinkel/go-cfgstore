@@ -31,6 +31,7 @@ type ConfigStore interface {
 	SetRelFilepath(dt.RelFilepath)
 	SetConfigDir(dt.DirPath)
 	ConfigDir() (dt.DirPath, error)
+	EnsureDirs(subdirs []dt.PathSegment) error
 	WithDirType(DirType) ConfigStore
 	DirType() DirType
 	ConfigStore()
@@ -298,6 +299,21 @@ end:
 func (cs *configStore) SetConfigDir(dir dt.DirPath) {
 	cs.configDir = dir
 	cs.fs = dt.DirFS(dir)
+}
+
+// EnsureDirs creates the specified subdirectories under this ConfigStore's config directory.
+// This is a convenience method that delegates to EnsureConfigDirs function.
+func (cs *configStore) EnsureDirs(subdirs []dt.PathSegment) (err error) {
+	var configDir dt.DirPath
+
+	configDir, err = cs.ConfigDir()
+	if err != nil {
+		goto end
+	}
+	err = EnsureConfigDirs(configDir, subdirs)
+
+end:
+	return err
 }
 
 func (cs *configStore) WithDirType(dt DirType) ConfigStore {

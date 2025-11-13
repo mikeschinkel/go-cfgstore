@@ -81,19 +81,22 @@ func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath)
 	})
 }
 
+func DefaultDirsProvider() *DirsProvider {
+	return &DirsProvider{
+		UserHomeDirFunc:   dt.UserHomeDir,
+		UserConfigDirFunc: dt.UserConfigDir,
+		GetwdFunc:         dt.Getwd,
+		ProjectDirFunc: func() (dt.DirPath, error) {
+			return dt.Getwd()
+		},
+	}
+}
 func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
 	if dirType == UnspecifiedConfigDir {
 		panic("NewConfigStore: DirType is Unspecified")
 	}
 	if args.DirsProvider == nil {
-		args.DirsProvider = &DirsProvider{
-			UserHomeDirFunc:   dt.UserHomeDir,
-			UserConfigDirFunc: dt.UserConfigDir,
-			GetwdFunc:         dt.Getwd,
-			ProjectDirFunc: func() (dt.DirPath, error) {
-				return dt.Getwd()
-			},
-		}
+		args.DirsProvider = DefaultDirsProvider()
 	}
 	return &configStore{
 		dirType:      dirType,

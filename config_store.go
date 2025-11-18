@@ -8,7 +8,6 @@ import (
 	"runtime"
 
 	"github.com/mikeschinkel/go-dt"
-	"github.com/mikeschinkel/go-dt/de"
 	"github.com/mikeschinkel/go-dt/dtx"
 )
 

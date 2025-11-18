@@ -2,7 +2,6 @@ package cfgstore
 
 import (
 	"github.com/mikeschinkel/go-dt"
-	"github.com/mikeschinkel/go-dt/de"
 )
 
 // EnsureConfigDirs creates the specified subdirectories under the given config directory.

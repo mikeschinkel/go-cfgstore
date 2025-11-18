@@ -19,13 +19,3 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace (
-	github.com/mikeschinkel/go-cliutil => ../go-cliutil
-	github.com/mikeschinkel/go-dt => ../go-dt
-	github.com/mikeschinkel/go-dt/appinfo => ../go-dt/appinfo
-	github.com/mikeschinkel/go-dt/de => ../go-dt/de
-	github.com/mikeschinkel/go-dt/dtx => ../go-dt/dtx
-	github.com/mikeschinkel/go-fsfix => ../go-fsfix
-	github.com/mikeschinkel/go-testutil => ../go-testutil
-)

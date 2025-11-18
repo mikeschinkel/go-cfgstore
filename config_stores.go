@@ -1,15 +1,15 @@
 package cfgstore
 
-import (
-	"github.com/mikeschinkel/go-dt"
-)
-
 type ConfigStoreMap map[DirType]ConfigStore
 
+type RootConfigMap map[DirType]RootConfig
+type MergeRootConfigsFunc func(RootConfigMap) RootConfig
+
 type ConfigStores struct {
-	DirTypes  []DirType
-	StoreMap  ConfigStoreMap
-	GetwdFunc func() (dt.DirPath, error)
+	DirTypes []DirType
+	StoreMap ConfigStoreMap
+	//GetwdFunc func() (dt.DirPath, error)
+	MergeRootConfigsFunc MergeRootConfigsFunc
 }
 
 func (stores *ConfigStores) CLIConfigStore() (cs ConfigStore) {
@@ -24,7 +24,9 @@ func (stores *ConfigStores) ProjectConfigStore() (cs ConfigStore) {
 
 type ConfigStoresArgs struct {
 	ConfigStoreArgs
-	DirTypes []DirType
+	DirTypes             []DirType
+	DirsProvider         *DirsProvider
+	MergeRootConfigsFunc MergeRootConfigsFunc
 }
 
 func NewConfigStores(args ConfigStoresArgs) (css *ConfigStores) {
@@ -35,8 +37,9 @@ func NewConfigStores(args ConfigStoresArgs) (css *ConfigStores) {
 		}
 	}
 	css = &ConfigStores{
-		DirTypes: args.DirTypes,
-		StoreMap: make(ConfigStoreMap, len(args.DirTypes)),
+		DirTypes:             args.DirTypes,
+		StoreMap:             make(ConfigStoreMap, len(args.DirTypes)),
+		MergeRootConfigsFunc: args.MergeRootConfigsFunc,
 	}
 	for _, dirType := range args.DirTypes {
 		css.StoreMap[dirType] = NewConfigStore(dirType, args.ConfigStoreArgs)
@@ -61,12 +64,22 @@ func (stores *ConfigStores) FirstStore() (cs ConfigStore) {
 }
 
 type RootConfigArgs struct {
-	DirTypes []DirType
-	Options  Options
+	DirTypes     []DirType
+	Options      Options
+	DirsProvider *DirsProvider
+}
+
+type RootConfigPtr[RC any] interface {
+	RootConfig
+	*RC
+}
+
+func makeRootConfig[RC any, PRC RootConfigPtr[RC]]() PRC {
+	return PRC(new(RC))
 }
 
 // LoadRootConfig also specifying the config stores in a map to enable unit testing
-func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (err error) {
+func LoadRootConfig[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args RootConfigArgs) (prc PRC, err error) {
 	var cs *configStore
 	var errs []error
 
@@ -77,9 +90,15 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (
 		}
 	}
 
-	for _, store := range stores.StoreMap {
+	rcMap := make(map[DirType]PRC, len(args.DirTypes))
+	for dirType, store := range stores.StoreMap {
 		cs = store.(*configStore)
-		err = cs.ensureConfig(rc, args.Options)
+		if args.DirsProvider != nil {
+			cs.dirsProvider = args.DirsProvider
+		}
+		var tmpPRC PRC
+		tmpPRC = makeRootConfig[RC, PRC]()
+		err = cs.ensureConfig(tmpPRC, dirType, args.Options)
 		if err != nil {
 			fp, _ := cs.GetFilepath()
 			errs = append(errs, NewErr(
@@ -87,25 +106,30 @@ func (stores *ConfigStores) LoadRootConfig(rc RootConfig, args RootConfigArgs) (
 				"filepath", fp,
 				err,
 			))
+			continue
 		}
+		rcMap[dirType] = tmpPRC
 	}
 	err = CombineErrs(errs)
 	if err != nil {
 		goto end
 	}
-
-	// TODO Merge them here instead of just returning FirstStore
-
-	cs = stores.FirstStore().(*configStore)
-	err = cs.loadConfigIfExists(rc, args.Options)
-	if err != nil {
-		err = NewErr(
-			ErrFailedToLoadConfig,
-			err,
-		)
+	if stores.MergeRootConfigsFunc == nil {
+		var ok bool
+		// TODO Explore if implementing a default merge is viable
+		prc, ok = rcMap[args.DirTypes[0]]
+		if !ok {
+			err = NewErr(ErrNoRootConfigsLoaded)
+		}
 		goto end
 	}
-
+	{
+		tmpMap := make(map[DirType]RootConfig, len(rcMap))
+		for dirType, rc := range rcMap {
+			tmpMap[dirType] = rc
+		}
+		prc = stores.MergeRootConfigsFunc(tmpMap).(PRC)
+	}
 end:
-	return err
+	return prc, err
 }

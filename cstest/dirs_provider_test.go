@@ -73,20 +73,28 @@ func TestNewTestDirsProvider_UserConfigDir(t *testing.T) {
 	require.NotNil(t, provider)
 	require.NotNil(t, provider.UserConfigDirFunc)
 
-	configDir, err := provider.UserConfigDirFunc()
+	userDir, err := provider.UserConfigDirFunc()
 	require.NoError(t, err)
 
 	// Should be prefixed with testRoot
-	assert.Contains(t, string(configDir), string(testRoot), "UserConfigDir should contain testRoot")
+	assert.Contains(t, string(userDir), string(testRoot), "UserConfigDir should contain testRoot")
 
+	require.NotNil(t, provider.CLIConfigDirFunc)
+
+	cliDir, err := provider.CLIConfigDirFunc()
+	require.NoError(t, err)
+
+	// Should be prefixed with testRoot
+	assert.Contains(t, string(cliDir), string(testRoot), "CLIConfigDir should contain testRoot")
+	assert.Contains(t, string(cliDir), "/testuser/.config", "CLIConfigDir should end with '/testuser/.config'")
 	// Should be OS-appropriate
 	switch runtime.GOOS {
 	case "darwin":
-		assert.Contains(t, string(configDir), "/Users/testuser/Library/Application Support")
+		assert.Contains(t, string(userDir), "/Users/testuser/Library/Application Support")
 	case "windows":
-		assert.Contains(t, string(configDir), "Users\\testuser\\AppData\\Roaming")
+		assert.Contains(t, string(userDir), "Users\\testuser\\AppData\\Roaming")
 	default: // Unix/Linux
-		assert.Contains(t, string(configDir), "/home/testuser/.config")
+		assert.Contains(t, string(userDir), "/home/testuser/.config")
 	}
 }
 

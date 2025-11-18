@@ -97,6 +97,15 @@ func NewTestDirsProvider(args *TestDirsProviderArgs) *cfgstore.DirsProvider {
 		end:
 			return dp, err
 		},
+		CLIConfigDirFunc: func() (dp dt.DirPath, err error) {
+			dp, err = getTestCLIConfigDir(args.Username)
+			if err != nil {
+				goto end
+			}
+			dp = args.GetTestRoot(dp)
+		end:
+			return dp, err
+		},
 	}
 }
 
@@ -150,6 +159,22 @@ end:
 	if err != nil {
 		err = dt.WithErr(err,
 			cfgstore.ErrFailedGettingUserConfigDir,
+		)
+	}
+	return dir, err
+}
+func getTestCLIConfigDir(username dt.PathSegment) (dir dt.DirPath, err error) {
+	var homeDir dt.DirPath
+
+	homeDir, err = getTestUserHomeDir(username)
+	if err != nil {
+		goto end
+	}
+	dir = dt.DirPathJoin(homeDir, cfgstore.DotConfigPathSegment)
+end:
+	if err != nil {
+		err = dt.WithErr(err,
+			cfgstore.ErrFailedGettingCLIConfigDir,
 		)
 	}
 	return dir, err

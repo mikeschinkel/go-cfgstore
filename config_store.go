@@ -5,7 +5,7 @@ import (
 	jsonv2 "encoding/json/v2"
 	"io/fs"
 	"os"
-	"path/filepath"
+	"runtime"
 
 	"github.com/mikeschinkel/go-dt"
 	"github.com/mikeschinkel/go-dt/de"
@@ -82,7 +82,7 @@ func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath)
 }
 
 func DefaultDirsProvider() *DirsProvider {
-	return &DirsProvider{
+	dp := &DirsProvider{
 		UserHomeDirFunc:   dt.UserHomeDir,
 		UserConfigDirFunc: dt.UserConfigDir,
 		GetwdFunc:         dt.Getwd,
@@ -90,6 +90,8 @@ func DefaultDirsProvider() *DirsProvider {
 			return dt.Getwd()
 		},
 	}
+	dp.CLIConfigDirFunc = dp.CLIConfigDir
+	return dp
 }
 func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
 	if dirType == UnspecifiedConfigDir {
@@ -106,21 +108,27 @@ func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
 	}
 }
 
-func RootRelative(p string) (string, error) {
-
-	vol := filepath.VolumeName(p) // "C:" or "\\server\\share"
-	if vol == "" {                // not a rooted Windows path
-		return p, nil
+// CLIConfigDir returns the absolute of either ~/.config/ or XDG_CONFIG_HOME on Linux
+func (dp *DirsProvider) CLIConfigDir() (dir dt.DirPath, err error) {
+	switch runtime.GOOS {
+	case "linux":
+		// Linux defaults to "~/.config" but we want to always support XDG_CONFIG_HOME
+		dir, err = dp.UserConfigDirFunc()
+		if err != nil {
+			err = NewErr(ErrFailedGettingUserConfigDir, err)
+			goto end
+		}
+	default:
+		// For macOS and Win always wwant "~/.config" for CLI usage
+		dir, err = dp.UserHomeDirFunc()
+		if err != nil {
+			err = NewErr(ErrFailedGettingUserHomeDir, err)
+			goto end
+		}
 	}
-	base := vol + string(os.PathSeparator) // "C:\" or "\\server\\share\"
-	rel, err := filepath.Rel(base, p)      // strip the volume root
-	if err != nil {
-		return "", err
-	}
-	if rel == "." { // exactly the root
-		return "", nil
-	}
-	return rel, nil
+	dir = dt.DirPathJoin(dir, DotConfigPathSegment)
+end:
+	return dir, err
 }
 
 func (cs *configStore) ConfigDir() (dir dt.DirPath, err error) {
@@ -131,12 +139,11 @@ func (cs *configStore) ConfigDir() (dir dt.DirPath, err error) {
 		dp := cs.dirsProvider
 		switch cs.dirType {
 		case CLIConfigDir:
-			dir, err = dp.UserHomeDirFunc()
+			dir, err = dp.CLIConfigDirFunc()
 			if err != nil {
-				err = NewErr(ErrFailedGettingUserHomeDir, err)
 				goto end
 			}
-			cs.configDir = dt.DirPathJoin3(dir, DotConfigPathSegment, cs.configSlug)
+			cs.configDir = dt.DirPathJoin(dir, cs.configSlug)
 
 		case ProjectConfigDir:
 			dir, err = dp.ProjectDirFunc()
@@ -337,8 +344,8 @@ func (cs *configStore) IsNil() bool {
 	return cs == nil
 }
 
-func (cs *configStore) ensureConfig(rc RootConfig, opts Options) (err error) {
-	err = cs.loadConfigIfExists(rc, opts)
+func (cs *configStore) ensureConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
+	err = cs.loadConfigIfExists(rc, dirType, opts)
 	if err != nil {
 		// A real error occurred, bail out
 		goto end
@@ -346,7 +353,7 @@ func (cs *configStore) ensureConfig(rc RootConfig, opts Options) (err error) {
 
 	if rc == nil || dtx.IsZero(rc) {
 		// Config not loaded, need to create config
-		err = cs.createConfig(rc, opts)
+		err = cs.createConfig(rc, dirType, opts)
 		goto end
 	}
 
@@ -354,13 +361,18 @@ end:
 	return err
 }
 
-func (cs *configStore) createConfig(rc RootConfig, opts Options) (err error) {
+func (cs *configStore) createConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
 	var fp dt.Filepath
+
 	fp, err = cs.GetFilepath()
 	if err != nil {
 		goto end
 	}
-	err = rc.Normalize(fp, opts)
+	err = rc.Normalize(NormalizeArgs{
+		DirType:    dirType,
+		SourceFile: fp,
+		Options:    opts,
+	})
 	if err != nil {
 		goto end
 	}
@@ -372,7 +384,7 @@ end:
 	return err
 }
 
-func (cs *configStore) loadConfigIfExists(rc RootConfig, opts Options) (err error) {
+func (cs *configStore) loadConfigIfExists(rc RootConfig, dirType DirType, opts Options) (err error) {
 	var fp dt.Filepath
 	if !cs.Exists() {
 		goto end
@@ -386,7 +398,11 @@ func (cs *configStore) loadConfigIfExists(rc RootConfig, opts Options) (err erro
 	if err != nil {
 		goto end
 	}
-	err = rc.Normalize(fp, opts)
+	err = rc.Normalize(NormalizeArgs{
+		DirType:    dirType,
+		SourceFile: fp,
+		Options:    opts,
+	})
 	if err != nil {
 		goto end
 	}

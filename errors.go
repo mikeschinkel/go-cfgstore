@@ -16,6 +16,7 @@ var (
 	ErrInvalidConfigDirType       = errors.New("invalid config dir type")
 	ErrFailedGettingWorkingDir    = errors.New("failed to get working dir")
 	ErrFailedGettingUserConfigDir = errors.New("failed to get user config dir")
+	ErrFailedGettingCLIConfigDir  = errors.New("failed to get CLI config dir")
 	ErrFailedGettingUserHomeDir   = errors.New("failed to get user home dir")
 	ErrFailedGettingUserCacheDir  = errors.New("failed to get user cache dir")
 )
@@ -30,3 +31,5 @@ var (
 )
 
 var ErrInvalidConfigFilepath = errors.New("invalid config filepath")
+
+var ErrNoRootConfigsLoaded = errors.New("no root configs loaded")

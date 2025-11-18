@@ -119,7 +119,7 @@ func getTestProjectDir(args *TestDirsProviderArgs) (dir dt.DirPath, err error) {
 
 	if args.ProjectDir == "" {
 		err = dt.NewErr(
-			de.ErrEmpty,
+			dt.ErrEmpty,
 			"dir_type", cfgstore.ProjectConfigDir.Slug(),
 		)
 		goto end

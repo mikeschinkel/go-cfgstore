@@ -25,7 +25,7 @@ func EnsureConfigDirs(configDir dt.DirPath, subdirs []dt.PathSegment) (err error
 		err := dt.MkdirAll(dirPath, 0755)
 		if err != nil {
 			errs = append(errs, dt.NewErr(
-				de.ErrFailedCreatingDirectory,
+				dt.ErrFailedCreatingDirectory,
 				err,
 				"dir", dirPath,
 			))

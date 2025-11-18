@@ -200,7 +200,7 @@ func (cs *configStore) GetFilepath() (fp dt.Filepath, err error) {
 
 	if !cs.relFilepath.ValidPath() {
 		err = NewErr(
-			de.ErrInvalid,
+			dt.ErrInvalid,
 			dt.ErrInvalidForOpen,
 			"filepath", cs.relFilepath,
 		)

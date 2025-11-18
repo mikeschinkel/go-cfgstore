@@ -3,15 +3,17 @@ package cfgstore
 type ConfigStoreMap map[DirType]ConfigStore
 
 type RootConfigMap map[DirType]RootConfig
-type MergeRootConfigsFunc func(RootConfigMap) RootConfig
 
 type ConfigStores struct {
 	DirTypes []DirType
 	StoreMap ConfigStoreMap
 	//GetwdFunc func() (dt.DirPath, error)
-	MergeRootConfigsFunc MergeRootConfigsFunc
 }
 
+func (stores *ConfigStores) AppConfigStore() (cs ConfigStore) {
+	cs, _ = stores.StoreMap[AppConfigDir]
+	return cs
+}
 func (stores *ConfigStores) CLIConfigStore() (cs ConfigStore) {
 	cs, _ = stores.StoreMap[CLIConfigDir]
 	return cs
@@ -19,14 +21,12 @@ func (stores *ConfigStores) CLIConfigStore() (cs ConfigStore) {
 func (stores *ConfigStores) ProjectConfigStore() (cs ConfigStore) {
 	cs, _ = stores.StoreMap[ProjectConfigDir]
 	return cs
-
 }
 
 type ConfigStoresArgs struct {
 	ConfigStoreArgs
-	DirTypes             []DirType
-	DirsProvider         *DirsProvider
-	MergeRootConfigsFunc MergeRootConfigsFunc
+	DirTypes     []DirType
+	DirsProvider *DirsProvider
 }
 
 func NewConfigStores(args ConfigStoresArgs) (css *ConfigStores) {
@@ -37,9 +37,8 @@ func NewConfigStores(args ConfigStoresArgs) (css *ConfigStores) {
 		}
 	}
 	css = &ConfigStores{
-		DirTypes:             args.DirTypes,
-		StoreMap:             make(ConfigStoreMap, len(args.DirTypes)),
-		MergeRootConfigsFunc: args.MergeRootConfigsFunc,
+		DirTypes: args.DirTypes,
+		StoreMap: make(ConfigStoreMap, len(args.DirTypes)),
 	}
 	for _, dirType := range args.DirTypes {
 		css.StoreMap[dirType] = NewConfigStore(dirType, args.ConfigStoreArgs)
@@ -114,21 +113,14 @@ func LoadRootConfig[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args Ro
 	if err != nil {
 		goto end
 	}
-	if stores.MergeRootConfigsFunc == nil {
-		var ok bool
-		// TODO Explore if implementing a default merge is viable
-		prc, ok = rcMap[args.DirTypes[0]]
-		if !ok {
-			err = NewErr(ErrNoRootConfigsLoaded)
-		}
-		goto end
-	}
 	{
-		tmpMap := make(map[DirType]RootConfig, len(rcMap))
-		for dirType, rc := range rcMap {
-			tmpMap[dirType] = rc
+		dirType := args.DirTypes[0]
+		rc := RootConfig(rcMap[dirType])
+		for i := 1; i < len(args.DirTypes); i++ {
+			dirType = args.DirTypes[i]
+			rc = rcMap[dirType].Merge(rc)
 		}
-		prc = stores.MergeRootConfigsFunc(tmpMap).(PRC)
+		prc = rcMap[dirType]
 	}
 end:
 	return prc, err

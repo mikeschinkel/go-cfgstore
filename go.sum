@@ -10,8 +10,7 @@ github.com/mikeschinkel/go-dt/appinfo v0.2.1 h1:5BB8HQtGFyZ0qCG2DoBSeDBc9CblEJef
 github.com/mikeschinkel/go-dt/appinfo v0.2.1/go.mod h1:OW7bt0cwIdM8brbREnLByJJlODESIaHsEY+pvXxDEiQ=
 github.com/mikeschinkel/go-dt/dtx v0.2.1 h1:OsFs0kHuEZuSJwGyTI+LDZVABf5pAvcPXDuEI08j5PY=
 github.com/mikeschinkel/go-dt/dtx v0.2.1/go.mod h1:mFuyP/9gMzCKaLXhFWOXHngR2ou2jun7yE67NZRBhW8=
-github.com/mikeschinkel/go-fsfix v0.2.0 h1:7ADfjc175/YXdQBegXbn7aV9uOv3umSUFsymRlGBzXQ=
-github.com/mikeschinkel/go-fsfix v0.2.0/go.mod h1:oLpZDdL8ouFX0MTywc/UPpDyLVMq+OPTuZInTGduGt0=
+github.com/mikeschinkel/go-fsfix v0.2.1 h1:r/czvij27hSoRggtbD6uP3wp7Nt3kzVZvh2ikoKo2F4=
 github.com/mikeschinkel/go-fsfix v0.2.1/go.mod h1:WttCjdD0GIlXObKALv1Lqv9xeavks4qrjfjs3yP8ISU=
 github.com/mikeschinkel/go-testutil v0.1.0 h1:/0busmc4pHKYslmAuXP5DmNn8bnsAPj5CQjvZ2GDmJk=
 github.com/mikeschinkel/go-testutil v0.1.0/go.mod h1:p+6VK/z2QbHZhFtRTyPBuoIks9WlwDuDzbMv/KO1reY=

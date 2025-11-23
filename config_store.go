@@ -14,7 +14,7 @@ import (
 // DefaultConfigDirType is currently hardcoded for ~/.config but having this
 // const will make it easy to track down how where to change it if we want to make it
 // configurable.
-const DefaultConfigDirType = CLIConfigDir
+const DefaultConfigDirType = CLIConfigDirType
 
 const DotConfigPathSegment dt.PathSegment = ".config"
 
@@ -67,14 +67,14 @@ type ConfigStoreArgs struct {
 }
 
 func NewCLIConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath) ConfigStore {
-	return NewConfigStore(CLIConfigDir, ConfigStoreArgs{
+	return NewConfigStore(CLIConfigDirType, ConfigStoreArgs{
 		ConfigSlug:  configSlug,
 		RelFilepath: configFile,
 	})
 }
 
 func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath) ConfigStore {
-	return NewConfigStore(ProjectConfigDir, ConfigStoreArgs{
+	return NewConfigStore(ProjectConfigDirType, ConfigStoreArgs{
 		ConfigSlug:  configSlug,
 		RelFilepath: configFile,
 	})
@@ -89,11 +89,11 @@ func DefaultDirsProvider() *DirsProvider {
 			return dt.Getwd()
 		},
 	}
-	dp.CLIConfigDirFunc = dp.CLIConfigDir
+	dp.CLIConfigDirFunc = dp.CLIConfigDirType
 	return dp
 }
 func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
-	if dirType == UnspecifiedConfigDir {
+	if dirType == UnspecifiedConfigDirType {
 		panic("NewConfigStore: DirType is Unspecified")
 	}
 	if args.DirsProvider == nil {
@@ -107,8 +107,8 @@ func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
 	}
 }
 
-// CLIConfigDir returns the absolute of either ~/.config/ or XDG_CONFIG_HOME on Linux
-func (dp *DirsProvider) CLIConfigDir() (dir dt.DirPath, err error) {
+// CLIConfigDirType returns the absolute of either ~/.config/ or XDG_CONFIG_HOME on Linux
+func (dp *DirsProvider) CLIConfigDirType() (dir dt.DirPath, err error) {
 	switch runtime.GOOS {
 	case "linux":
 		// Linux defaults to "~/.config" but we want to always support XDG_CONFIG_HOME
@@ -134,43 +134,7 @@ func (cs *configStore) ConfigDir() (dir dt.DirPath, err error) {
 	if cs.configDir != "" {
 		goto end
 	}
-	{
-		dp := cs.dirsProvider
-		switch cs.dirType {
-		case CLIConfigDir:
-			dir, err = dp.CLIConfigDirFunc()
-			if err != nil {
-				goto end
-			}
-			cs.configDir = dt.DirPathJoin(dir, cs.configSlug)
-
-		case ProjectConfigDir:
-			dir, err = dp.ProjectDirFunc()
-			if err != nil {
-				err = NewErr(ErrFailedGettingWorkingDir, err)
-				goto end
-			}
-			cs.configDir = dt.DirPathJoin(dir, "."+cs.configSlug)
-
-		case AppConfigDir:
-			dir, err = dp.UserConfigDirFunc()
-			if err != nil {
-				err = NewErr(ErrFailedGettingUserConfigDir, err)
-				goto end
-			}
-			cs.configDir = dt.DirPathJoin(dir, cs.configSlug)
-
-		case UnspecifiedConfigDir:
-			err = NewErr(ErrConfigDirTypeNotSet)
-			goto end
-		default:
-			err = NewErr(
-				ErrInvalidConfigDirType,
-				"config_dir_type", cs.dirType,
-			)
-			goto end
-		}
-	}
+	cs.configDir, err = ConfigDir(cs.dirType, cs.configSlug, cs.dirsProvider)
 end:
 	return cs.configDir, err
 }

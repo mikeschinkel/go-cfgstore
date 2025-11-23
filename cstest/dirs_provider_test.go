@@ -85,8 +85,8 @@ func TestNewTestDirsProvider_UserConfigDir(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should be prefixed with testRoot
-	assert.Contains(t, string(cliDir), string(testRoot), "CLIConfigDir should contain testRoot")
-	assert.Contains(t, string(cliDir), "/testuser/.config", "CLIConfigDir should end with '/testuser/.config'")
+	assert.Contains(t, string(cliDir), string(testRoot), "CLIConfigDirType should contain testRoot")
+	assert.Contains(t, string(cliDir), "/testuser/.config", "CLIConfigDirType should end with '/testuser/.config'")
 	// Should be OS-appropriate
 	switch runtime.GOOS {
 	case "darwin":
@@ -146,7 +146,7 @@ func TestNewTestDirsProvider_Getwd(t *testing.T) {
 }
 
 func TestTestDirsProviderArgs_GetTestRoot(t *testing.T) {
-	testRoot := dt.DirPath("/tmp/test-root")
+	testRoot := dt.DirPathJoin(dt.TempDir(), "test-root")
 
 	args := &cstest.TestDirsProviderArgs{
 		Username:   "testuser",
@@ -212,7 +212,7 @@ func TestTestDirsProviderArgs_RelConfigDir(t *testing.T) {
 		Username:   "testuser",
 		ProjectDir: "testproject",
 		ConfigSlug: "myapp",
-		TestRoot:   "/tmp/test",
+		TestRoot:   dt.DirPathJoin(dt.TestDir(), "test"),
 	}
 
 	relPath := args.RelConfigDir()

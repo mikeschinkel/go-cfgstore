@@ -11,15 +11,15 @@ type ConfigStores struct {
 }
 
 func (stores *ConfigStores) AppConfigStore() (cs ConfigStore) {
-	cs, _ = stores.StoreMap[AppConfigDir]
+	cs, _ = stores.StoreMap[AppConfigDirType]
 	return cs
 }
 func (stores *ConfigStores) CLIConfigStore() (cs ConfigStore) {
-	cs, _ = stores.StoreMap[CLIConfigDir]
+	cs, _ = stores.StoreMap[CLIConfigDirType]
 	return cs
 }
 func (stores *ConfigStores) ProjectConfigStore() (cs ConfigStore) {
-	cs, _ = stores.StoreMap[ProjectConfigDir]
+	cs, _ = stores.StoreMap[ProjectConfigDirType]
 	return cs
 }
 
@@ -32,8 +32,8 @@ type ConfigStoresArgs struct {
 func NewConfigStores(args ConfigStoresArgs) (css *ConfigStores) {
 	if len(args.DirTypes) == 0 {
 		args.DirTypes = []DirType{
-			CLIConfigDir,
-			ProjectConfigDir,
+			CLIConfigDirType,
+			ProjectConfigDirType,
 		}
 	}
 	css = &ConfigStores{
@@ -84,8 +84,8 @@ func LoadRootConfig[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args Ro
 
 	if len(args.DirTypes) == 0 {
 		args.DirTypes = []DirType{
-			CLIConfigDir,
-			ProjectConfigDir,
+			CLIConfigDirType,
+			ProjectConfigDirType,
 		}
 	}
 

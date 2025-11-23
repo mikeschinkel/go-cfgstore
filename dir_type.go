@@ -4,13 +4,13 @@ type DirType int
 
 func (dt DirType) String() string {
 	switch dt {
-	case AppConfigDir:
+	case AppConfigDirType:
 		return "App config dir"
-	case CLIConfigDir:
+	case CLIConfigDirType:
 		return "CLI config dir"
-	case ProjectConfigDir:
+	case ProjectConfigDirType:
 		return "Project config dir"
-	case UnspecifiedConfigDir:
+	case UnspecifiedConfigDirType:
 		return "Unspecified config dir"
 	default:
 	}
@@ -19,13 +19,13 @@ func (dt DirType) String() string {
 
 func (dt DirType) Slug() string {
 	switch dt {
-	case AppConfigDir:
+	case AppConfigDirType:
 		return "app"
-	case CLIConfigDir:
+	case CLIConfigDirType:
 		return "cli"
-	case ProjectConfigDir:
+	case ProjectConfigDirType:
 		return "project"
-	case UnspecifiedConfigDir:
+	case UnspecifiedConfigDirType:
 		return "unspecified"
 	default:
 	}
@@ -33,8 +33,8 @@ func (dt DirType) Slug() string {
 }
 
 const (
-	UnspecifiedConfigDir DirType = iota
-	AppConfigDir                 // The value os.UserConfigDir() returns
-	CLIConfigDir                 // ~/.config/xmlui
-	ProjectConfigDir             // <projectDir>/.xmlui
+	UnspecifiedConfigDirType DirType = iota
+	AppConfigDirType                 // The value os.UserConfigDir() returns
+	CLIConfigDirType                 // ~/.config/xmlui
+	ProjectConfigDirType             // <projectDir>/.xmlui
 )

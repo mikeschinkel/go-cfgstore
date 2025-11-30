@@ -1,28 +1,87 @@
-.PHONY: test test-verbose test-coverage build clean help
+.PHONY: help test test-unit test-corpus test-all lint build clean fmt vet tidy examples
 
-# Enable JSON v2 experiment for Go 1.25+
-export GOEXPERIMENT=jsonv2
+LINTER = "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"
 
+# Default target
 help:
 	@echo "Available targets:"
-	@echo "  test          - Run tests"
-	@echo "  test-verbose  - Run tests with verbose output"
-	@echo "  test-coverage - Run tests with coverage report"
-	@echo "  build         - Build the package"
-	@echo "  clean         - Clean build artifacts"
-	@echo "  help          - Show this help message"
+	@echo "  make test         - Run unit tests"
+	@echo "  make test-corpus  - Run fuzz corpus regression tests"
+	@echo "  make test-all     - Run all tests (unit + corpus)"
+	@echo "  make lint         - Run golangci-lint"
+	@echo "  make fmt          - Format code with gofmt"
+	@echo "  make vet          - Run go vet"
+	@echo "  make tidy         - Run go mod tidy (main + test)"
+	@echo "  make build        - Build the package"
+	@echo "  make examples     - Build examples to ./bin/"
+	@echo "  make clean        - Clean build artifacts"
+	@echo "  make ci           - Run all CI checks (fmt, vet, lint, test-all)"
 
-test:
-	go test ./...
+# Go environment (requires jsonv2 experiment)
+GOEXPERIMENT ?= jsonv2
+GO := GOEXPERIMENT=$(GOEXPERIMENT) go
 
-test-verbose:
-	go test -v ./...
+ensure-valid: tidy test lint vet examples
 
-test-coverage:
-	go test -cover ./...
+# Run unit tests
+test: test-unit
 
+test-unit:
+	@$(GO) test -v -race -coverprofile=test/coverage.txt -covermode=atomic ./... || exit 1
+	@cd test && $(GO) test -v -race ./... || exit 1
+
+# Run fuzz corpus regression tests
+test-corpus:
+	@cd test && $(GO) test -v -run=TestFuzzCorpus || exit 1
+
+# Run all tests
+test-all: test-unit test-corpus
+
+# Run linter
+lint:
+	$(GO) run $(LINTER) run ./... --timeout=5m
+
+# Format code
+fmt:
+	gofmt -s -w .
+
+# Run go vet
+vet:
+	$(GO) vet ./...
+
+# Run go mod tidy
+tidy:
+	@echo "Running go mod tidy for main package..."
+	@$(GO) mod tidy || exit 1
+	@echo "Running go mod tidy for test..."
+	@cd test && $(GO) mod tidy || exit 1
+
+# Build the package
 build:
-	go build ./...
+	$(GO) build ./...
 
+# Build examples to ./bin/
+examples:
+	@mkdir -p bin
+	@set -e; for example in examples/*/; do \
+		name=$$(basename $$example); \
+		echo "Building $$name..."; \
+		cd $$example && \
+		$(GO) mod init example 2>/dev/null || true && \
+		$(GO) mod edit -replace github.com/mikeschinkel/go-cfgstore=../.. && \
+		$(GO) mod tidy || exit 1; \
+		$(GO) build -o ../../bin/$$name . || exit 1; \
+		cd ../..; \
+	done
+	@echo "Examples built to ./bin/"
+
+# Clean build artifacts
 clean:
-	go clean ./...
+	$(GO) clean
+	rm -f coverage.txt test/coverage.txt
+	rm -rf bin
+	cd test && $(GO) clean
+
+# Run all CI checks locally
+ci: fmt vet lint test-all
+	@echo "All CI checks passed!"

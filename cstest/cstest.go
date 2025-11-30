@@ -2,25 +2,10 @@ package cstest
 
 import (
 	"os"
-	"testing"
 
 	"github.com/mikeschinkel/go-cfgstore"
 	"github.com/mikeschinkel/go-dt"
 )
-
-func RemoveAll(t *testing.T, cs cfgstore.ConfigStore) {
-	dir, err := cs.ConfigDir()
-	if err != nil {
-		t.Errorf("Failed tp get config dir: %v", err)
-		goto end
-	}
-	err = dir.RemoveAll()
-	if err != nil {
-		t.Errorf("Failed to remove config dir: %v", err)
-	}
-end:
-	return
-}
 
 func GetRelConfigDir(cs cfgstore.ConfigStore, args *TestDirsProviderArgs) (rel dt.PathSegments, err error) {
 	var vol dt.VolumeName

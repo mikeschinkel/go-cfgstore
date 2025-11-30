@@ -32,6 +32,7 @@ func (args *TestDirsProviderArgs) RelConfigDir() dt.PathSegments {
 		string(args.ConfigSlug),
 	))
 }
+
 func (args *TestDirsProviderArgs) OmitTestRoot() bool {
 	return args.omitTestRoot
 }
@@ -162,6 +163,7 @@ end:
 	}
 	return dir, err
 }
+
 func getTestCLIConfigDir(username dt.PathSegment) (dir dt.DirPath, err error) {
 	var homeDir dt.DirPath
 
@@ -178,6 +180,7 @@ end:
 	}
 	return dir, err
 }
+
 func getTestUserHomeDir(username dt.PathSegment) (dir dt.DirPath, err error) {
 	err = validateUsername(username)
 	if err != nil {

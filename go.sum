@@ -6,5 +6,5 @@ github.com/mikeschinkel/go-dt/appinfo v0.2.1 h1:5BB8HQtGFyZ0qCG2DoBSeDBc9CblEJef
 github.com/mikeschinkel/go-dt/appinfo v0.2.1/go.mod h1:OW7bt0cwIdM8brbREnLByJJlODESIaHsEY+pvXxDEiQ=
 github.com/mikeschinkel/go-dt/dtx v0.2.1 h1:OsFs0kHuEZuSJwGyTI+LDZVABf5pAvcPXDuEI08j5PY=
 github.com/mikeschinkel/go-dt/dtx v0.2.1/go.mod h1:mFuyP/9gMzCKaLXhFWOXHngR2ou2jun7yE67NZRBhW8=
-github.com/mikeschinkel/go-logutil v0.1.1 h1:cZYRFfgdgS7HFzvHErXmrYy5cRyDscaq/nAuxupJXLY=
-github.com/mikeschinkel/go-logutil v0.1.1/go.mod h1:FTov/Lq+y1Eu817aEL0VmzL7ZlPUqYnqcmxPVMlrvmE=
+github.com/mikeschinkel/go-logutil v0.1.2 h1:TjPFbb1ont7M3aHgv56u6z5u10FLSetKoX8SBGjjBVA=
+github.com/mikeschinkel/go-logutil v0.1.2/go.mod h1:9yohJICBoO3NHyyIR4A4YnDtqOT1xnCNQX4gvxzxTqE=

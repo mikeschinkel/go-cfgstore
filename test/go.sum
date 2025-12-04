@@ -12,8 +12,8 @@ github.com/mikeschinkel/go-dt/dtx v0.2.1 h1:OsFs0kHuEZuSJwGyTI+LDZVABf5pAvcPXDuE
 github.com/mikeschinkel/go-dt/dtx v0.2.1/go.mod h1:mFuyP/9gMzCKaLXhFWOXHngR2ou2jun7yE67NZRBhW8=
 github.com/mikeschinkel/go-logutil v0.2.1 h1:jYwZCRSA/rlXXNP4grOerzTkMx1OcLZQjarjSJqVFzg=
 github.com/mikeschinkel/go-logutil v0.2.1/go.mod h1:1yNSU+v0f+8anOjTq8hvHG7/A2FcRfVmXfnHTorHNk4=
-github.com/mikeschinkel/go-testutil v0.2.0 h1:TE0HxwQRrw/CkL9RnhMuFf30YdT7Fh0WGQmcUjq2x4Y=
-github.com/mikeschinkel/go-testutil v0.2.0/go.mod h1:mbT3JPjrtlp8KuKTOj5cXX+0gjqgJN/JqfNqPdKi3ak=
+github.com/mikeschinkel/go-testutil v0.2.1 h1:jI232rxSc6dS0XwCDSO5WpC9bb+2xZPYFJk1J6RzWoc=
+github.com/mikeschinkel/go-testutil v0.2.1/go.mod h1:oPFd+C2liN+b8MD0Vn67ExqyT7x1DJp52fsfGb4V4LM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=

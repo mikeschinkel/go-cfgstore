@@ -4,11 +4,11 @@ go 1.25.3
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/mikeschinkel/go-cfgstore v0.0.0
+	github.com/mikeschinkel/go-cfgstore v0.3.0
 	github.com/mikeschinkel/go-dt v0.3.1
 	github.com/mikeschinkel/go-dt/appinfo v0.2.1
 	github.com/mikeschinkel/go-dt/dtx v0.2.1
-	github.com/mikeschinkel/go-testutil v0.2.0
+	github.com/mikeschinkel/go-testutil v0.2.1
 	github.com/stretchr/testify v1.11.1
 )
 

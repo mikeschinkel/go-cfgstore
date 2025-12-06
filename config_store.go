@@ -35,7 +35,6 @@ type ConfigStore interface {
 	DirType() DirType
 	ConfigStore()
 	ConfigSlug() dt.PathSegment
-	IsNil() bool
 }
 
 var _ ConfigStore = (*configStore)(nil)
@@ -78,6 +77,28 @@ func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath)
 		ConfigSlug:  configSlug,
 		RelFilepath: configFile,
 	})
+}
+
+// InitProjectConfig initializes a project config.
+// Returns the initialized config and an error (ErrConfigAlreadyExists if config already exists).
+func InitProjectConfig[RC any, PRC RootConfigPtr[RC]](
+	configSlug dt.PathSegment,
+	configFile dt.RelFilepath,
+	opts Options,
+) (prc PRC, err error) {
+	var cs *configStore
+
+	store := NewProjectConfigStore(configSlug, configFile)
+	cs = store.(*configStore)
+	prc = PRC(new(RC))
+
+	err = cs.initConfig(prc, ProjectConfigDirType, opts)
+	if err != nil {
+		goto end
+	}
+
+end:
+	return prc, err
 }
 
 func DefaultDirsProvider() *DirsProvider {
@@ -303,10 +324,6 @@ func (cs *configStore) ConfigSlug() dt.PathSegment {
 	return cs.configSlug
 }
 
-func (cs *configStore) IsNil() bool {
-	return cs == nil
-}
-
 func (cs *configStore) ensureConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
 	err = cs.loadConfigIfExists(rc, dirType, opts)
 	if err != nil {
@@ -343,6 +360,17 @@ func (cs *configStore) createConfig(rc RootConfig, dirType DirType, opts Options
 	if err != nil {
 		goto end
 	}
+end:
+	return err
+}
+
+// InitConfig initializes a new config, returning an error if it already exists
+func (cs *configStore) initConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
+	if cs.Exists() {
+		err = ErrConfigAlreadyExists
+		goto end
+	}
+	err = cs.createConfig(rc, dirType, opts)
 end:
 	return err
 }

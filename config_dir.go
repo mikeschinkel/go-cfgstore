@@ -8,10 +8,10 @@ func CLIConfigDir(configSlug dt.PathSegment) (cd dt.DirPath, err error) {
 	return ConfigDir(CLIConfigDirType, configSlug, nil)
 }
 func AppConfigDir(configSlug dt.PathSegment) (cd dt.DirPath, err error) {
-	return ConfigDir(CLIConfigDirType, configSlug, nil)
+	return ConfigDir(AppConfigDirType, configSlug, nil)
 }
 func ProjectConfigDir(configSlug dt.PathSegment) (cd dt.DirPath, err error) {
-	return ConfigDir(CLIConfigDirType, configSlug, nil)
+	return ConfigDir(ProjectConfigDirType, configSlug, nil)
 }
 
 func ConfigDir(dirType DirType, configSlug dt.PathSegment, dp *DirsProvider) (cd dt.DirPath, err error) {

@@ -81,8 +81,18 @@ func makeRootConfig[RC any, PRC RootConfigPtr[RC]]() PRC {
 	return PRC(new(RC))
 }
 
-// LoadRootConfig also specifying the config stores in a map to enable unit testing
-func LoadRootConfig[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args RootConfigArgs) (prc PRC, err error) {
+// LoadConfigStores loads and merges root configuration from multiple config stores.
+// Later stores in the DirTypes array take precedence over earlier ones.
+// This is the low-level function that provides maximum control over the loading process.
+//
+// Use this when you need to:
+// - Pre-create ConfigStores for reuse
+// - Test with custom ConfigStores
+// - Have fine-grained control over store creation and configuration loading
+//
+// For simpler use cases, consider using LoadConfig, LoadCLIConfig, LoadProjectConfig,
+// or LoadDefaultConfig instead.
+func LoadConfigStores[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args RootConfigArgs) (prc PRC, err error) {
 	var cs *configStore
 	var errs []error
 

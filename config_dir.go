@@ -4,14 +4,44 @@ import (
 	"github.com/mikeschinkel/go-dt"
 )
 
-func CLIConfigDir(configSlug dt.PathSegment) (cd dt.DirPath, err error) {
-	return ConfigDir(CLIConfigDirType, configSlug, nil)
+func CLIConfigDir(configSlug dt.PathSegment, dps ...*DirsProvider) (cd dt.DirPath, err error) {
+	var dp *DirsProvider
+	if dps != nil {
+		dp = dps[0]
+	}
+	cd, err = ConfigDir(CLIConfigDirType, configSlug, dp)
+	return cd, err
 }
-func AppConfigDir(configSlug dt.PathSegment) (cd dt.DirPath, err error) {
-	return ConfigDir(AppConfigDirType, configSlug, nil)
+func AppConfigDir(configSlug dt.PathSegment, dps ...*DirsProvider) (cd dt.DirPath, err error) {
+	var dp *DirsProvider
+	if dps != nil {
+		dp = dps[0]
+	}
+	cd, err = ConfigDir(AppConfigDirType, configSlug, dp)
+	return cd, err
 }
-func ProjectConfigDir(configSlug dt.PathSegment) (cd dt.DirPath, err error) {
-	return ConfigDir(ProjectConfigDirType, configSlug, nil)
+func ProjectConfigDir(configSlug dt.PathSegment, dps ...*DirsProvider) (cd dt.DirPath, err error) {
+	var dp *DirsProvider
+	if dps != nil {
+		dp = dps[0]
+	}
+	cd, err = ConfigDir(ProjectConfigDirType, configSlug, dp)
+	return cd, err
+}
+
+func ProjectConfigFilepath(configSlug dt.PathSegment, configFile dt.RelFilepath, dps ...*DirsProvider) (cfp dt.Filepath, err error) {
+	var cd dt.DirPath
+	var dp *DirsProvider
+	if dps != nil {
+		dp = dps[0]
+	}
+	cd, err = ConfigDir(ProjectConfigDirType, configSlug, dp)
+	if err != nil {
+		goto end
+	}
+	cfp = dt.FilepathJoin(cd, configFile)
+end:
+	return cfp, err
 }
 
 func ConfigDir(dirType DirType, configSlug dt.PathSegment, dp *DirsProvider) (cd dt.DirPath, err error) {

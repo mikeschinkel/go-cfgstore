@@ -12,8 +12,12 @@ var (
 	ErrFileDoesNotExist            = errors.New("file does not exist")
 )
 var (
-	ErrConfigDirTypeNotSet        = errors.New("config dir type not set")
-	ErrInvalidConfigDirType       = errors.New("invalid config dir type")
+	ErrConfigDirTypeNotSet  = errors.New("config dir type not set")
+	ErrInvalidConfigDirType = errors.New("invalid config dir type")
+)
+
+// TODO: Please these with dt.ErrAccessing*Dir
+var (
 	ErrFailedGettingWorkingDir    = errors.New("failed to get working dir")
 	ErrFailedGettingUserConfigDir = errors.New("failed to get user config dir")
 	ErrFailedGettingCLIConfigDir  = errors.New("failed to get CLI config dir")

@@ -81,9 +81,8 @@ func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath)
 
 // ProjectConfigStoreExists checks if a project config store exists at the specified project directory
 func ProjectConfigStoreExists(projectDir dt.DirPath, configSlug dt.PathSegment, configFile dt.RelFilepath) (exists bool) {
-	var store ConfigStore
 
-	store = NewProjectConfigStore(configSlug, configFile)
+	store := NewProjectConfigStore(configSlug, configFile)
 	store.SetConfigDir(projectDir)
 	exists = store.Exists()
 
@@ -93,9 +92,9 @@ func ProjectConfigStoreExists(projectDir dt.DirPath, configSlug dt.PathSegment, 
 // InitProjectConfig initializes a project config.
 // Returns the initialized config and an error (ErrConfigAlreadyExists if config already exists).
 func InitProjectConfig[RC any, PRC RootConfigPtr[RC]](
-	configSlug dt.PathSegment,
-	configFile dt.RelFilepath,
-	opts Options,
+		configSlug dt.PathSegment,
+		configFile dt.RelFilepath,
+		opts Options,
 ) (prc PRC, err error) {
 	var cs *configStore
 

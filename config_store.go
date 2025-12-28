@@ -92,9 +92,9 @@ func ProjectConfigStoreExists(projectDir dt.DirPath, configSlug dt.PathSegment, 
 // InitProjectConfig initializes a project config.
 // Returns the initialized config and an error (ErrConfigAlreadyExists if config already exists).
 func InitProjectConfig[RC any, PRC RootConfigPtr[RC]](
-		configSlug dt.PathSegment,
-		configFile dt.RelFilepath,
-		opts Options,
+	configSlug dt.PathSegment,
+	configFile dt.RelFilepath,
+	opts Options,
 ) (prc PRC, err error) {
 	var cs *configStore
 
@@ -111,6 +111,17 @@ end:
 	return prc, err
 }
 
+type DirsProviderArgs struct {
+	CustomDirPath dt.DirPath
+}
+
+func DefaultDirsProviderWithArgs(args DirsProviderArgs) (dp *DirsProvider) {
+	dp = DefaultDirsProvider()
+	dp.CustomConfigDirFunc = func() (dt.DirPath, error) {
+		return args.CustomDirPath, nil
+	}
+	return dp
+}
 func DefaultDirsProvider() *DirsProvider {
 	dp := &DirsProvider{
 		UserHomeDirFunc:   dt.UserHomeDir,
@@ -253,7 +264,7 @@ func (cs *configStore) Load() (data []byte, err error) {
 	}
 
 	data, err = cs.relFilepath.ReadFile(fSys)
-	if NoSuchFileOrDirectory(err) {
+	if NoFileOrDirErr(err) {
 		err = NewErr(ErrFileDoesNotExist, err)
 	}
 	if err != nil {

@@ -29,21 +29,6 @@ func ProjectConfigDir(configSlug dt.PathSegment, dps ...*DirsProvider) (cd dt.Di
 	return cd, err
 }
 
-func ProjectConfigFilepath(configSlug dt.PathSegment, configFile dt.RelFilepath, dps ...*DirsProvider) (cfp dt.Filepath, err error) {
-	var cd dt.DirPath
-	var dp *DirsProvider
-	if dps != nil {
-		dp = dps[0]
-	}
-	cd, err = ConfigDir(ProjectConfigDirType, configSlug, dp)
-	if err != nil {
-		goto end
-	}
-	cfp = dt.FilepathJoin(cd, configFile)
-end:
-	return cfp, err
-}
-
 func ConfigDir(dirType DirType, configSlug dt.PathSegment, dp *DirsProvider) (cd dt.DirPath, err error) {
 	var dir dt.DirPath
 	if dp == nil {
@@ -73,6 +58,13 @@ func ConfigDir(dirType DirType, configSlug dt.PathSegment, dp *DirsProvider) (cd
 			goto end
 		}
 		cd = dt.DirPathJoin(dir, configSlug)
+
+	case CustomConfigDirType:
+		cd, err = dp.CustomConfigDirFunc()
+		if err != nil {
+			err = NewErr(ErrFailedGettingCustomConfigDir, err)
+			goto end
+		}
 
 	case UnspecifiedConfigDirType:
 		err = NewErr(ErrConfigDirTypeNotSet)

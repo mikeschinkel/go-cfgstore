@@ -19,7 +19,7 @@ type CacheOptions struct {
 //
 // Example: GetSharedCacheDir("xmlui") → ~/.cache/xmlui/ on Linux
 func GetSharedCacheDir(slug dt.PathSegment, opts ...CacheOptions) (dt.DirPath, error) {
-	return getCacheDir(slug, "", opts...)
+	return GetAppCacheDir(slug, "", opts...)
 }
 
 // GetAppCacheDir returns an app-specific cache directory under the shared cache.
@@ -30,15 +30,14 @@ func GetSharedCacheDir(slug dt.PathSegment, opts ...CacheOptions) (dt.DirPath, e
 //
 // Example: GetAppCacheDir("xmlui", "cli") → ~/.cache/xmlui/cli/ on Linux
 func GetAppCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (dt.DirPath, error) {
-	return getCacheDir(slug, appName, opts...)
-}
-
-// getCacheDir is the internal implementation for cache directory resolution
-func getCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (dt.DirPath, error) {
 	var dp *DirsProvider
+	var cachePath dt.DirPath
+
 	if len(opts) > 0 && opts[0].DirsProvider != nil {
 		dp = opts[0].DirsProvider
-	} else {
+	}
+
+	if dp == nil {
 		dp = &DirsProvider{
 			UserCacheDirFunc: dt.UserCacheDir,
 		}
@@ -46,34 +45,36 @@ func getCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (dt.DirPath
 
 	cacheDir, err := dp.UserCacheDirFunc()
 	if err != nil {
-		return "", NewErr(ErrFailedGettingUserCacheDir, err)
+		err = NewErr(ErrFailedGettingUserCacheDir, err)
+		goto end
 	}
 
 	// Platform-specific path construction
-	var cachePath dt.DirPath
 	switch runtime.GOOS {
 	case "darwin":
 		// macOS: ~/Library/Caches/{slug}[/{appName}]
-		if appName != "" {
-			cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
-		} else {
+		if appName == "" {
 			cachePath = dt.DirPathJoin(cacheDir, slug)
+			goto end
 		}
+		cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
+
 	case "windows":
 		// Windows: %LOCALAPPDATA%\{slug}[{\appName}]
-		if appName != "" {
-			cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
-		} else {
+		if appName == "" {
 			cachePath = dt.DirPathJoin(cacheDir, slug)
+			goto end
 		}
+		cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
+
 	default:
 		// Linux and others: ~/.cache/{slug}[/{appName}]
-		if appName != "" {
-			cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
-		} else {
+		if appName == "" {
 			cachePath = dt.DirPathJoin(cacheDir, slug)
+			goto end
 		}
+		cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
 	}
-
+end:
 	return cachePath, nil
 }

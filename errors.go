@@ -18,11 +18,12 @@ var (
 
 // TODO: Please these with dt.ErrAccessing*Dir
 var (
-	ErrFailedGettingWorkingDir    = errors.New("failed to get working dir")
-	ErrFailedGettingUserConfigDir = errors.New("failed to get user config dir")
-	ErrFailedGettingCLIConfigDir  = errors.New("failed to get CLI config dir")
-	ErrFailedGettingUserHomeDir   = errors.New("failed to get user home dir")
-	ErrFailedGettingUserCacheDir  = errors.New("failed to get user cache dir")
+	ErrFailedGettingWorkingDir      = errors.New("failed to get working dir")
+	ErrFailedGettingUserConfigDir   = errors.New("failed to get user config dir")
+	ErrFailedGettingCustomConfigDir = errors.New("failed to get custom config dir")
+	ErrFailedGettingCLIConfigDir    = errors.New("failed to get CLI config dir")
+	ErrFailedGettingUserHomeDir     = errors.New("failed to get user home dir")
+	ErrFailedGettingUserCacheDir    = errors.New("failed to get user cache dir")
 )
 
 var ErrFailedToEnsureConfig = errors.New("failed to ensure config")

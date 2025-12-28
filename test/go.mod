@@ -8,7 +8,7 @@ require (
 	github.com/mikeschinkel/go-dt v0.3.3
 	github.com/mikeschinkel/go-dt/appinfo v0.2.1
 	github.com/mikeschinkel/go-dt/dtx v0.2.1
-	github.com/mikeschinkel/go-testutil v0.2.1
+	github.com/mikeschinkel/go-testutil v0.3.0
 	github.com/stretchr/testify v1.11.1
 )
 
@@ -21,3 +21,4 @@ require (
 )
 
 replace github.com/mikeschinkel/go-cfgstore => ..
+replace github.com/mikeschinkel/go-testutil => ../../../go-pkgs/go-testutil

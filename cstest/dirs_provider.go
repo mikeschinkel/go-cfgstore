@@ -16,12 +16,13 @@ const (
 )
 
 type TestDirsProviderArgs struct {
-	Username     dt.PathSegment
-	TestRoot     dt.DirPath
-	TestRootFunc func() dt.DirPath
-	ProjectDir   dt.DirPath
-	ConfigSlug   dt.PathSegment
-	omitTestRoot bool
+	Username      dt.PathSegment
+	TestRoot      dt.DirPath
+	TestRootFunc  func() dt.DirPath
+	ProjectDir    dt.DirPath
+	ConfigSlug    dt.PathSegment
+	CustomDirPath dt.DirPath
+	omitTestRoot  bool
 }
 
 func (args *TestDirsProviderArgs) RelConfigDir() dt.PathSegments {
@@ -105,6 +106,9 @@ func NewTestDirsProvider(args *TestDirsProviderArgs) *cfgstore.DirsProvider {
 			dp = args.GetTestRoot(dp)
 		end:
 			return dp, err
+		},
+		CustomConfigDirFunc: func() (dp dt.DirPath, err error) {
+			return args.GetTestRoot(args.CustomDirPath), err
 		},
 	}
 }

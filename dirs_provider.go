@@ -7,12 +7,13 @@ import (
 type DirFunc func() (dt.DirPath, error)
 
 type DirsProvider struct {
-	UserHomeDirFunc   DirFunc
-	GetwdFunc         DirFunc
-	ProjectDirFunc    DirFunc
-	UserConfigDirFunc DirFunc
-	CLIConfigDirFunc  DirFunc
-	UserCacheDirFunc  DirFunc
+	UserHomeDirFunc     DirFunc
+	GetwdFunc           DirFunc
+	ProjectDirFunc      DirFunc
+	UserConfigDirFunc   DirFunc
+	CustomConfigDirFunc DirFunc
+	CLIConfigDirFunc    DirFunc
+	UserCacheDirFunc    DirFunc
 }
 
 //func (dp DirsProvider) WithProjectDir(dir dt.DirPath) DirsProvider {

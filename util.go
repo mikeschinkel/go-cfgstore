@@ -9,7 +9,7 @@ import (
 	"syscall"
 )
 
-func NoSuchFileOrDirectory(err error) (is bool) {
+func NoFileOrDirErr(err error) (is bool) {
 	var pathError *fs.PathError
 	var errNo syscall.Errno
 	if err == nil {
@@ -35,7 +35,7 @@ end:
 
 func ReadFileIfExists(file string) (bytes []byte, err error) {
 	bytes, err = os.ReadFile(file)
-	if NoSuchFileOrDirectory(err) {
+	if NoFileOrDirErr(err) {
 		err = nil
 	}
 	return bytes, err

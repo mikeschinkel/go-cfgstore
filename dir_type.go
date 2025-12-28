@@ -37,4 +37,5 @@ const (
 	AppConfigDirType                 // The value os.UserConfigDir() returns
 	CLIConfigDirType                 // ~/.config/xmlui
 	ProjectConfigDirType             // <projectDir>/.xmlui
+	CustomConfigDirType              // <customDir>/.xmlui
 )

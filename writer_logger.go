@@ -17,7 +17,7 @@ type WriterLoggerArgs struct {
 	Quiet      bool
 	Verbosity  cliutil.Verbosity
 	ConfigSlug dt.PathSegment
-	LogFile    dt.Filename
+	LogFile    dt.RelFilepath
 }
 
 func CreateWriterLogger(args *WriterLoggerArgs) (wr cliutil.WriterLogger, err error) {

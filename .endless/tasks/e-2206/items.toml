@@ -19,3 +19,9 @@ id = "P3"
 kind = "deliverable"
 statement = "Remove pre-Endless leftovers: .squire/, logs/, and the Makefile, ported to a justfile"
 verify = "E-2206 verify suite"
+
+[[item]]
+id = "P4"
+kind = "deliverable"
+statement = "File each friction point as a task in endless, linked to E-2206"
+verify = "endless task deps E-2206"

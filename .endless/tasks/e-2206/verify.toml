@@ -1,0 +1,12 @@
+# Verification suite for E-2206 — bring go-cfgstore up to current Endless usage.
+# DO NOT EDIT unless you ARE E-2206. See .endless/tasks/CLAUDE.md.
+#
+# go-cfgstore has no _harness.sh, so the one check is a self-contained sh
+# script emitting TAP.
+schema = 1
+task   = "E-2206"
+
+[[check]]
+runner  = "sh"
+command = "sh \"$ENDLESS_VERIFY_DIR\"/onboarding.sh"
+format  = "tap"

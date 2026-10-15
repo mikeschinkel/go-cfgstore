@@ -13,3 +13,9 @@ id = "P2"
 kind = "deliverable"
 statement = "Claim, work and land a task in go-cfgstore end to end, recording each step that failed or needed a workaround"
 verify = "E-2206 lands with endless worktree land; the failures are filed or reported"
+
+[[item]]
+id = "P3"
+kind = "deliverable"
+statement = "Remove pre-Endless leftovers: .squire/, logs/, and the Makefile, ported to a justfile"
+verify = "E-2206 verify suite"

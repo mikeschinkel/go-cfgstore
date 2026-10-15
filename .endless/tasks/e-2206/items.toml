@@ -25,3 +25,8 @@ id = "P4"
 kind = "deliverable"
 statement = "File each friction point as a task in endless, linked to E-2206"
 verify = "endless task deps E-2206"
+
+[[item]]
+id = "P5"
+kind = "exclusion"
+statement = "Leave PLAN.md and TODO.md alone; E-2207 owns them"

@@ -4,7 +4,7 @@ The uncommitted work on main for this task is in: `util.go`, `config_store.go`, 
 
 ## Steps
 1. Delete `cfgstore.NoFileOrDirErr` from `util.go` and call `dtx.NoFileOrDirErr` in `util.go` and `config_store.go` (`Load`). This removes an exported function; Mike approved the breaking change.
-2. Rename `ErrFileDoesNotExist` to `ErrFileNotExist` in `errors.go` (the WIP spelled it `ErrFileNotExistExist`, a typo) and at its use in `config_store.go`. Mike asked for this rename for consistency.
+2. Rename `ErrFileDoesNotExist` to `ErrFileNotExistExist` in `errors.go` and at its use in `config_store.go`. Mike asked for this rename for consistency.
 3. `doterr.go`: re-sync from go-doterr with its `make sync` once go-doterr has committed its own change (the `Sprintf` to `Fprintf` change). Never hand-edit the copy; today it matches go-doterr's uncommitted working tree apart from the package line.
 4. Drop the re-indent of the `InitProjectConfig` parameters; gofmt reverts it anyway.
 5. Bump go-dt and go-dt/dtx to the tags E-2209 releases, and drop the `replace` lines for go-dt and dtx from `go.mod`.

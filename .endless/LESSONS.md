@@ -24,3 +24,7 @@ While resuming E-2206 (go-cfgstore onboarding), I told Mike about an Endless hoo
 ### [2026-10-15] Every do task needs a verify script
 On E-2206 (go-cfgstore onboarding), I handed the task over without a verify suite and said there was no verify script. Mike: all 'do' tasks need a verify script, even if they do nothing, and landing can't be tried until the verify suite has run.
 - **Project**: go-cfgstore
+
+### [2026-10-15] Run Endless task updates myself, don't hand them to Mike
+On E-2206, when endless task update E-2351 failed for me because my session would not resolve, I gave Mike the command to run instead. Mike: managing task state is my job. When an endless command fails for me, work out how to make it succeed (or report the failure), rather than handing the command over.
+- **Project**: go-cfgstore

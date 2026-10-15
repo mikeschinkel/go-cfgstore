@@ -1,0 +1,15 @@
+{
+  "name": "go-cfgstore",
+  "label": "",
+  "description": "",
+  "language": "go",
+  "status": "active",
+  "dependencies": [],
+  "minimizer": {
+    "enabled": false,
+    "optimizer": false
+  },
+  "documents": {
+    "rules": []
+  }
+}

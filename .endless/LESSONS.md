@@ -32,3 +32,7 @@ On E-2206, when endless task update E-2351 failed for me because my session woul
 ### [2026-10-15] Give short paste-safe commands
 While walking Mike through recovering E-2206 (go-cfgstore), I gave him a long sed command with a full absolute path; it broke across lines when he copied it from the terminal and could not run. When handing Mike commands to paste, keep each one short enough not to wrap: cd to the directory first as its own command, then use short relative commands, one per code block.
 - **Project**: go-cfgstore
+
+### [2026-10-15] Work through an agreed list without asking
+After E-2206 landed, I listed ten Endless gaps from the recovery and asked Mike 'Shall I work through the list now?'. He had already asked for the gaps to be closed (find a task, fold in, or file), so asking again only stalled the work; he asked why I waited. When Mike has asked for a body of work and I've just enumerated it, start on it.
+- **Project**: go-cfgstore

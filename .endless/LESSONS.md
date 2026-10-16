@@ -36,3 +36,7 @@ While walking Mike through recovering E-2206 (go-cfgstore), I gave him a long se
 ### [2026-10-15] Work through an agreed list without asking
 After E-2206 landed, I listed ten Endless gaps from the recovery and asked Mike 'Shall I work through the list now?'. He had already asked for the gaps to be closed (find a task, fold in, or file), so asking again only stalled the work; he asked why I waited. When Mike has asked for a body of work and I've just enumerated it, start on it.
 - **Project**: go-cfgstore
+
+### [2026-10-15] File the feature Mike described, not a near reading
+While filing E-2357 from E-2206, Mike asked that a session's task stay in the status graph, dimmed, once it lands. I titled and summarized it as 'keep a landed task in the graph, dimmed', which read as reverting the earlier task that removes terminal tasks from the graph. What he wanted: dim it only once it has landed or otherwise stopped being a blocker. When filing a feature Mike describes, state the condition he named, especially where a looser wording would undo earlier work he wanted.
+- **Project**: go-cfgstore

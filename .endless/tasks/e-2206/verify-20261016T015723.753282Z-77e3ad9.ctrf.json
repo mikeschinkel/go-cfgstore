@@ -1,0 +1,89 @@
+{
+  "results": {
+    "tool": {
+      "name": "endless"
+    },
+    "summary": {
+      "tests": 14,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "other": 0,
+      "start": 0,
+      "stop": 0
+    },
+    "tests": [
+      {
+        "name": "config.json is tracked",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "config.json names the project go-cfgstore",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "config.json disables the minimizer and optimizer",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": ".gitignore ignores .endless/worktrees/",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": ".gitignore ignores .endless/tmp/",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": ".gitignore ignores .endless/worktree.json",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": ".gitignore ignores .endless/worktree.lock",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": ".endless/tasks/CLAUDE.md is tracked",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "CLAUDE.md is tracked",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "CLAUDE.md points agents at endless guide",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "justfile is tracked",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "Makefile is gone",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": ".squire/ is gone",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "just build succeeds",
+        "status": "passed",
+        "duration": 0
+      }
+    ]
+  }
+}

@@ -40,3 +40,7 @@ After E-2206 landed, I listed ten Endless gaps from the recovery and asked Mike 
 ### [2026-10-15] File the feature Mike described, not a near reading
 While filing E-2357 from E-2206, Mike asked that a session's task stay in the status graph, dimmed, once it lands. I titled and summarized it as 'keep a landed task in the graph, dimmed', which read as reverting the earlier task that removes terminal tasks from the graph. What he wanted: dim it only once it has landed or otherwise stopped being a blocker. When filing a feature Mike describes, state the condition he named, especially where a looser wording would undo earlier work he wanted.
 - **Project**: go-cfgstore
+
+### [2026-10-15] Fold findings before filing them
+After E-2206 landed, Mike asked me to close the gaps it surfaced by landing, folding or filing. I filed nine new tasks, and he pointed me to ED-1550: filing is the exception, several symptoms of one cause are one task, and a finding goes into an open task that owns its area. Six of the nine belonged in E-2063, E-2291, E-2349 or a sibling, and I superseded them into those. When closing a batch of findings, group them by cause and search for owning tasks first; file only what nothing owns.
+- **Project**: go-cfgstore

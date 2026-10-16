@@ -1,0 +1,1 @@
+PLAN.md, which was staged on go-cfgstore's main, is parked unchanged on branch wip/e2351-e2352 (commit 06694b8), so main was clean for landing E-2206. Take it from there.

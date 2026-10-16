@@ -1,0 +1,1 @@
+This task's uncommitted work from go-cfgstore's main is parked on branch wip/e2351-e2352 (commit 06694b8), along with E-2207's PLAN.md and the other task's changes. Carry only this task's files into its worktree.

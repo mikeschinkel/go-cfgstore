@@ -1,0 +1,1 @@
+Folded into E-2349: re-running its fixed project init adds .endless/logs/ to go-cfgstore (ED-1550).

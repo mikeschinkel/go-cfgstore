@@ -28,3 +28,7 @@ On E-2206 (go-cfgstore onboarding), I handed the task over without a verify suit
 ### [2026-10-15] Run Endless task updates myself, don't hand them to Mike
 On E-2206, when endless task update E-2351 failed for me because my session would not resolve, I gave Mike the command to run instead. Mike: managing task state is my job. When an endless command fails for me, work out how to make it succeed (or report the failure), rather than handing the command over.
 - **Project**: go-cfgstore
+
+### [2026-10-15] Give short paste-safe commands
+While walking Mike through recovering E-2206 (go-cfgstore), I gave him a long sed command with a full absolute path; it broke across lines when he copied it from the terminal and could not run. When handing Mike commands to paste, keep each one short enough not to wrap: cd to the directory first as its own command, then use short relative commands, one per code block.
+- **Project**: go-cfgstore

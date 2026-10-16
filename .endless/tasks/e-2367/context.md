@@ -1,0 +1,1 @@
+E-2206's land was refused over .endless/logs/. Mike unblocked it with a local .git/info/exclude entry, which this replaces; remove that entry once this lands.

@@ -62,7 +62,7 @@ statement = "Does not tag or push a go-cfgstore release"
 [[item]]
 id = "P10"
 kind = "exclusion"
-statement = "Does not change any consumer's code; xmlui's svrcfg wrapper gets its own Merge in a task of xmlui's"
+statement = "Does not change any consumer's code, including xmlui's svrcfg wrapper"
 
 [[item]]
 id = "P11"

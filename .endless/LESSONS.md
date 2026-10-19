@@ -56,3 +56,7 @@ E-2208: lint flagged cache.go's GetAppCacheDir, which wrapped UserCacheDirFunc's
 ### [2026-10-19] When another repo's state gets in the way of a task, file the upstream chain with blockers and expect Mike to want the current task blocked too, for urgency
 E-2208: go-cfgstore's test module didn't build because go-testutil, go-cliutil and go-dt had uncommitted main changes. I advised against blocking E-2208, since the fix didn't need them. Mike: 'cleaning those up should be fast, and I need urgency for that cleanup which blocking would provide.' He wants tasks filed up the dependency chain until one lands on its own, with blockers, and existing ones pointed out. He said this about a chain of fast cleanups; ask when the cleanup isn't fast.
 - **Project**: go-cfgstore
+
+### [2026-10-19] A repo's main-checkout cleanup is one task that lands its own changes, not a task that files a task per change group (ED-1550); only tasks across projects stay separate
+E-2208: E-2375, E-2374 and the two I filed (E-2411, E-2412) said to file one task per change group. Mike: 'It seems like process theater to have so many tasks for such as small amount of work. See ED-1550 (but note that tasks that cross projects cannot be combined.)' Plan such cleanups to commit each group on the task's own branch, and split a group out only when it is too large or risky to review with the rest, with Mike's agreement.
+- **Project**: go-cfgstore

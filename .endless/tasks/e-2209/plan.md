@@ -13,3 +13,7 @@ current commit.
    `go mod tidy` and the tests, then commit, push and tag go-cfgstore.
 4. Write down every step you did by hand, and why: this release is the first
    real case for gomion's dependency-release commands.
+
+## Modules
+
+Every directory with its own `go.mod` is a separate Go module, versioned independently. Walk and release modules, not repos: each module whose contents changed since its last tag gets its own version decision and its own tag, prefixed by its directory below the repo root (`dtx/v0.2.1`, `appinfo/v0.2.2`). go-dt alone has nine modules (root, appinfo, appinfo/test, dtglob, dtglob/test, dtx, dtx/test, examples/basic_usage, test), and go-cliutil, go-testutil and go-cfgstore each have a root, test/ and examples/ modules. A require between two modules of the same repo is a dependency edge like any other and is ordered leaves-first.

@@ -895,39 +895,54 @@ func (c *MyConfig) RootConfig() {}
 
 #### Understanding Merge()
 
-The `Merge()` method enables hierarchical configuration with precedence rules. It's called during `LoadConfigStores()` when loading from multiple directories.
+The `Merge()` method enables hierarchical configuration with precedence rules. It's called during `LoadConfigStores()` (and so by `LoadConfig()` and `LoadDefaultConfig()`) when more than one layer loads.
 
 **How Merge Works:**
 1. Configs are loaded in DirTypes array order (e.g., CLI first, then Project)
-2. For each subsequent config, call `Merge()` on it with the previous config as argument
-3. The receiver (caller) typically has higher precedence
-4. Return a new merged config
+2. For each later config, `Merge()` is called on it with the merge of every earlier config as its argument
+3. `Merge()` returns the merged config, as a value of its receiver's own concrete type
+4. The loader returns the result of the last `Merge()`: every layer's values, not just the last layer's
+
+When only one layer loads, it is returned as loaded and `Merge()` is not called.
 
 **Example with CLIConfigDirType → ProjectConfigDirType:**
 ```go
 // In merging loop:
 rc = projectConfig.Merge(cliConfig)
-// projectConfig values typically take precedence over cliConfig values
+// projectConfig values take precedence over cliConfig values by default
 ```
+
+**Precedence rules:**
+
+The receiver is the later, more specific layer (e.g. the project), and the parameter is the merge of the earlier, more general layers (e.g. the CLI config in `~/.config/myapp`, called "global" below). Each field picks one of these rules:
+
+| Rule | Result |
+|------|--------|
+| project-wins (the default) | The receiver's value when set, otherwise the parameter's |
+| project-only | The receiver's value, even when empty; the parameter's is ignored |
+| global-only | The parameter's value, even when empty; the receiver's is ignored |
+| global-wins | The parameter's value when set, otherwise the receiver's |
 
 **Implementation Pattern:**
 ```go
 type MyConfig struct {
-    Username     string `json:"username"`
-    Theme        string `json:"theme"`
-    Port         int    `json:"port"`
-    GlobalAPIKey string `json:"global_api_key"` // Global setting
+    Username     string `json:"username"`       // project-wins
+    Theme        string `json:"theme"`          // project-wins
+    Port         int    `json:"port"`           // project-wins
+    ProjectName  string `json:"project_name"`   // project-only
+    GlobalAPIKey string `json:"global_api_key"` // global-only
+    Registry     string `json:"registry"`       // global-wins
 }
 
-// Merge combines another config into this one
-// The receiver (c) typically takes precedence, but merge logic is field-specific
+// Merge combines other, the merge of the earlier layers, into c and returns
+// the result as a *MyConfig.
 func (c *MyConfig) Merge(other RootConfig) RootConfig {
     otherCfg := other.(*MyConfig)
 
     // Start with self
     result := *c
 
-    // Standard case: Receiver wins, fill missing from other
+    // project-wins: keep the receiver's value, fill it from other when empty
     if result.Username == "" {
         result.Username = otherCfg.Username
     }
@@ -938,10 +953,17 @@ func (c *MyConfig) Merge(other RootConfig) RootConfig {
         result.Port = otherCfg.Port
     }
 
-    // Special case: Global setting - parameter (CLI config) wins over receiver (project)
-    // This allows ~/.config/myapp to set a global API key for all projects
-    if result.GlobalAPIKey == "" && otherCfg.GlobalAPIKey != "" {
-        result.GlobalAPIKey = otherCfg.GlobalAPIKey
+    // project-only: keep the receiver's value, even when empty, so a project
+    // name set in ~/.config/myapp never leaks into a project
+    // (result.ProjectName is already c.ProjectName)
+
+    // global-only: take other's value, even when empty, so a project file
+    // cannot set the API key
+    result.GlobalAPIKey = otherCfg.GlobalAPIKey
+
+    // global-wins: take other's value when set, otherwise keep the receiver's
+    if otherCfg.Registry != "" {
+        result.Registry = otherCfg.Registry
     }
 
     return &result
@@ -949,13 +971,11 @@ func (c *MyConfig) Merge(other RootConfig) RootConfig {
 ```
 
 **Key Points:**
-- The receiver (config calling Merge) **typically** has higher precedence
-- The parameter (config passed to Merge) **typically** has lower precedence
-- **Usually**, non-zero/empty values from receiver override the parameter
-- **However**, merge logic is case-by-case - some fields may make more sense to inherit from the parameter
-  - Example: Global settings in `~/.config/myapp/config.json` might override project-specific settings for certain fields
-  - The implementer decides which precedence makes sense for each field
-- Return a new merged config, don't mutate the original
+- `Merge()` must return a non-nil value of its receiver's own concrete type (here `*MyConfig`). Loading fails with an error wrapping `ErrFailedToLoadConfig`, naming the layer and both types, when it returns `nil` or another type
+- The receiver (config calling Merge) has higher precedence by default
+- The parameter (config passed to Merge) has lower precedence by default
+- The implementer picks the rule that makes sense for each field
+- Returning a new merged config is clearest, but a `Merge()` that edits its receiver and returns it gives the same loaded result
 
 **Wrapper Pattern:**
 
@@ -985,6 +1005,14 @@ func (w *MyConfigWrapper) UnmarshalJSON(b []byte) error {
 }
 
 func (w *MyConfigWrapper) RootConfig() {}
+
+// Merge delegates to the embedded struct and wraps the result, so it returns
+// a *MyConfigWrapper. Without it, the wrapper would inherit MyConfig's Merge,
+// which returns a *MyConfig, and loading two or more layers would fail.
+func (w *MyConfigWrapper) Merge(other cfgstore.RootConfig) cfgstore.RootConfig {
+    merged := w.MyConfig.Merge(&other.(*MyConfigWrapper).MyConfig)
+    return &MyConfigWrapper{MyConfig: *merged.(*MyConfig)}
+}
 ```
 
 **Why the wrapper needs Marshal/Unmarshal methods:**

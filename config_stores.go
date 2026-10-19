@@ -2,6 +2,7 @@ package cfgstore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/mikeschinkel/go-dt"
 	"github.com/mikeschinkel/go-dt/dtx"
@@ -191,6 +192,10 @@ func mergeRootConfigs[RC any, PRC RootConfigPtr[RC]](rcMap map[DirType]PRC, args
 		rc = rcMap[typ].Merge(rc)
 		// Capture the key for the last merged config
 		dirType = typ
+		prc, err = mergedRootConfig[RC, PRC](rc, typ)
+		if err != nil {
+			goto end
+		}
 	}
 	if dirType == UnspecifiedConfigDirType {
 		// This should never happen - indicates a logic bug
@@ -202,8 +207,32 @@ func mergeRootConfigs[RC any, PRC RootConfigPtr[RC]](rcMap map[DirType]PRC, args
 		)
 		goto end
 	}
-	// The last merged config will be the config we return
-	prc = rcMap[dirType]
+end:
+	return prc, err
+}
+
+// mergedRootConfig converts the RootConfig that dirType's Merge returned back to
+// the caller's PRC, failing when Merge returned nil or another concrete type.
+func mergedRootConfig[RC any, PRC RootConfigPtr[RC]](rc RootConfig, dirType DirType) (prc PRC, err error) {
+	var returned string
+	var ok bool
+
+	prc, ok = rc.(PRC)
+	switch {
+	case rc == nil, ok && prc == nil:
+		returned = "nil"
+	case !ok:
+		returned = fmt.Sprintf("%T", rc)
+	default:
+		goto end
+	}
+	err = NewErr(
+		ErrFailedToLoadConfig,
+		"dir_type", dirType,
+		"expected_type", fmt.Sprintf("%T", prc),
+		"returned_type", returned,
+	)
+	prc = nil
 end:
 	return prc, err
 }

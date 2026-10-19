@@ -7,6 +7,10 @@ The changes at filing time (2026-10-19), excluding `.endless/`:
 - Modified: test/go.mod, test/go.sum.
 - test/go.mod bumps go-dt from v0.3.3 to v0.5.0 to match go-testutil's uncommitted main, which the test module reaches through its local go-testutil replace. With both in their current state the test module does not build from the main checkout (go reports a missing go.sum entry for go-dt).
 
+## Modules
+
+Every directory with its own `go.mod` is a separate Go module, versioned independently: a module below the root is tagged with its directory as a prefix (`dtx/v0.2.1`), and one module's require of another, even within this repo, names a version or a `replace`. go-cfgstore's modules at filing time are the root, examples/basic_usage/ and test/. Analyze and report the changes per module, and list every module whose contents change, so the release that follows can decide each one's version bump on its own.
+
 ## Steps
 
 1. **Snapshot without touching main.** From this task's worktree, read the main checkout's full diff against HEAD, staged and unstaged together, including deletions, binaries and untracked non-`.endless/` files. Recreate it on a branch named `wip/<task-id>` cut from main's HEAD, and commit it there as one commit with message "WIP snapshot of main working tree". Then confirm the branch's tree matches main's working tree file for file. Don't use `git stash`; the stash stack is shared across sessions.

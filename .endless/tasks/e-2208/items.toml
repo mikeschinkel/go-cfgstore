@@ -72,7 +72,7 @@ statement = "The README's Understanding Merge() section states project-wins as t
 [[item]]
 id = "P16"
 kind = "deliverable"
-statement = "GetAppCacheDir returns the error from UserCacheDirFunc instead of nil, clearing the ineffassign lint failure at cache.go"
+statement = "GetAppCacheDir returns the error from UserCacheDirFunc instead of nil, using named results (cachePath, err), clearing the ineffassign lint failure at cache.go"
 
 [[item]]
 id = "P17"

@@ -23,7 +23,8 @@ verify = "a test in test/ recording what each Merge received"
 [[item]]
 id = "P4"
 kind = "deliverable"
-statement = "The generic constraint RootConfigPtr requires MergeFrom(other *RC) *RC, and RootConfig no longer declares Merge, so a merge method that takes or returns another type fails to compile"
+statement = "A Merge that returns a concrete type other than the caller's config type makes loading return an error wrapping ErrFailedToLoadConfig that names the expected type and the returned one"
+verify = "a test in test/ whose Merge returns another type"
 
 [[item]]
 id = "P5"
@@ -34,7 +35,7 @@ verify = "a test in test/ with both kinds of Merge"
 [[item]]
 id = "P6"
 kind = "deliverable"
-statement = "A Merge that returns nil makes loading return an error naming the layer, not a nil config"
+statement = "A Merge that returns nil makes loading return an error wrapping ErrFailedToLoadConfig that names the layer, not a nil config"
 verify = "a test in test/"
 
 [[item]]
@@ -44,9 +45,14 @@ statement = "When only one layer loads, it is returned as loaded and Merge is no
 verify = "a test in test/ whose Merge records any call"
 
 [[item]]
-id = "P8"
+id = "P12"
 kind = "deliverable"
-statement = "gomion's gomcfg and xmlui's clicfg, mcpcfg and svrcfg each carry a comment at their Merge saying how to replace it with MergeFrom"
+statement = "The doc comment on RootConfig.Merge and the README's Understanding Merge() section state that Merge returns the merged config as its receiver's own concrete type, with the receiver's values taking precedence"
+
+[[item]]
+id = "P13"
+kind = "exclusion"
+statement = "Does not add, remove or change the signature of any exported method, type, constant or error in go-cfgstore"
 
 [[item]]
 id = "P9"
@@ -56,7 +62,7 @@ statement = "Does not tag or push a go-cfgstore release"
 [[item]]
 id = "P10"
 kind = "exclusion"
-statement = "Does not change gomion's, or xmlui's clicfg, mcpcfg or svrcfg Merge code; they stay broken until changed by hand"
+statement = "Does not change any consumer's code; xmlui's svrcfg wrapper gets its own Merge in a task of xmlui's"
 
 [[item]]
 id = "P11"

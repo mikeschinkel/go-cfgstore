@@ -67,4 +67,4 @@ statement = "The README's Wrapper Pattern example declares its own Merge, return
 [[item]]
 id = "P15"
 kind = "deliverable"
-statement = "The README's Understanding Merge() section names the four per-field precedence rules (project-only, global-only, project-wins, global-wins), each with an example whose code does what its comment says"
+statement = "The README's Understanding Merge() section states project-wins as the default precedence and names the other per-field rules (project-only, global-only, global-wins), each with an example whose code does what its comment says"

@@ -21,19 +21,17 @@ signature, and leaves two merge concepts. Taking `Merge` off `RootConfig` would
 also stop the interface, and the exported `RootConfigMap`, from describing a
 layer that can be merged.
 
-## Consumers
+## Types that embed a config
 
-Every local consumer builds against this checkout through a `replace`, and none
-needs a code change to compile.
+A type that embeds a config and declares no `Merge` of its own inherits the
+embedded type's, which returns the embedded type rather than the outer one, so
+loading it through two or more layers fails the conversion. The README's
+Wrapper Pattern shows exactly such a type: `MyConfigWrapper` declares
+`RootConfig`, `Normalize` and the JSON methods but no `Merge`.
 
-- endless's `EndlessConfig.Merge` returns a `*EndlessConfig` copy, so it gains
-  the CLI layer's values.
-- gomion's `gomcfg`, and xmlui's `clicfg` and `mcpcfg`, have stub `Merge`
-  methods but load the CLI layer alone, so `Merge` never runs.
-- xmlui's `svrcfg` loads `*RootConfigV1Wrapper`, which embeds `RootConfigV1`
-  and has no `Merge` of its own. The promoted `(*RootConfigV1).Merge` returns
-  the inner `*RootConfigV1`, so a two-layer load of it would fail with the new
-  error. None of its callers load two layers today. xmlui is dormant and not an
-  Endless project, so nothing is filed for it; the fix, should it ever be
-  revived, is a `Merge` on the wrapper that returns a `*RootConfigV1Wrapper`.
-- doctool, macmail-ext, go-stash and gru never load through the generic loader.
+## Compatibility
+
+No exported signature changes, so no implementer needs a code change to compile.
+An implementer whose `Merge` already returns its receiver's type gains the
+lower layers' values. One whose `Merge` returns another type now fails at load,
+and only when two or more layers load.

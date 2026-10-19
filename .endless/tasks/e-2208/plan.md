@@ -10,24 +10,24 @@ the CLI layer is lost.
 
 ## Approach
 
-Move `Merge` off the `RootConfig` interface and onto the generic constraint
-`RootConfigPtr[RC]`, typed in the concrete config:
+Replace `Merge` on the `RootConfig` interface with `MergeFrom` on the generic
+constraint `RootConfigPtr[RC]`, typed in the concrete config:
 
     type RootConfigPtr[RC any] interface {
         RootConfig
         *RC
-        Merge(other *RC) *RC
+        MergeFrom(other *RC) *RC
     }
 
 `RootConfig` keeps `RootConfig()` and `Normalize(...)`, the methods the
 non-generic store code (`ensureConfig`, `loadConfigIfExists` and friends) uses.
 `mergeRootConfigs` then carries the merge in `PRC` from start to finish and
-returns it, so no runtime type conversion exists and a `Merge` with the wrong
-types fails to compile. A `nil` from `Merge` is the one runtime failure left;
+returns it, so no runtime type conversion exists and a `MergeFrom` with the
+wrong types fails to compile. A `nil` from `MergeFrom` is the one runtime failure left;
 loading returns an error naming the layer.
 
 The single-layer path is unchanged: one loaded layer is returned as loaded,
-and `Merge` is not called. Merge order is unchanged: each later DirType's
+and `MergeFrom` is not called. Merge order is unchanged: each later DirType's
 config receives the result so far as `other`.
 
 ## Tests
@@ -41,3 +41,12 @@ In `test/`, using a test config type:
   and returns it, giving the same result;
 - a `Merge` that returns nil, producing an error;
 - one layer, with `Merge` never called.
+
+## Order of landing
+
+The method gets a new name so Endless can adopt it before this lands. A type
+cannot carry two methods named `Merge` with different signatures, but an extra
+`MergeFrom` is harmless against today's go-cfgstore. So Endless's
+`EndlessConfig` gains `MergeFrom` in a task of its own that lands first, and
+this task lands after it. Endless builds against this checkout through a
+`replace`, so it never sees a go-cfgstore it cannot compile against.

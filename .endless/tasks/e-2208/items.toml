@@ -63,3 +63,8 @@ statement = "Does not tag or push a go-cfgstore release"
 id = "P14"
 kind = "deliverable"
 statement = "The README's Wrapper Pattern example declares its own Merge, returning the wrapper type"
+
+[[item]]
+id = "P15"
+kind = "deliverable"
+statement = "The README's Understanding Merge() section names the four per-field precedence rules (project-only, global-only, project-wins, global-wins), each with an example whose code does what its comment says"

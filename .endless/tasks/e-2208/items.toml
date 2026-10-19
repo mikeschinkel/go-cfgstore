@@ -73,3 +73,8 @@ statement = "The README's Understanding Merge() section states project-wins as t
 id = "P16"
 kind = "deliverable"
 statement = "GetAppCacheDir returns the error from UserCacheDirFunc instead of nil, using named results (cachePath, err), clearing the ineffassign lint failure at cache.go"
+
+[[item]]
+id = "P18"
+kind = "deliverable"
+statement = "go-cfgstore's CLAUDE.md carries endless's 'Memory is OFF here' section, so corrections are recorded with endless lesson write"

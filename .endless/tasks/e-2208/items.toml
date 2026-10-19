@@ -60,11 +60,6 @@ kind = "exclusion"
 statement = "Does not tag or push a go-cfgstore release"
 
 [[item]]
-id = "P10"
-kind = "exclusion"
-statement = "Does not change any consumer's code, including xmlui's svrcfg wrapper"
-
-[[item]]
 id = "P11"
 kind = "exclusion"
 statement = "Does not change doctool, macmail-ext, go-stash or gru"

@@ -46,7 +46,7 @@ verify = "a test in test/ whose Merge records any call"
 [[item]]
 id = "P8"
 kind = "deliverable"
-statement = "gomion's gomcfg and xmlui's clicfg, mcpcfg and svrcfg each carry a comment at their Merge saying how to change it to the new signature"
+statement = "gomion's gomcfg and xmlui's clicfg, mcpcfg and svrcfg each carry a comment at their Merge saying how to replace it with MergeFrom"
 
 [[item]]
 id = "P9"

@@ -68,3 +68,8 @@ statement = "The README's Wrapper Pattern example declares its own Merge, return
 id = "P15"
 kind = "deliverable"
 statement = "The README's Understanding Merge() section states project-wins as the default precedence and names the other per-field rules (project-only, global-only, global-wins), each with an example whose code does what its comment says"
+
+[[item]]
+id = "P16"
+kind = "deliverable"
+statement = "GetAppCacheDir returns the error from UserCacheDirFunc instead of nil, clearing the ineffassign lint failure at cache.go"

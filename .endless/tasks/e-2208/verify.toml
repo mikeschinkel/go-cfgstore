@@ -1,0 +1,16 @@
+# Verification suite for E-2208 — mergeRootConfigs returns the merged config.
+# DO NOT EDIT unless you ARE E-2208. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2208"
+
+# E-2208's own tests first (P1–P7, P16), one CTRF entry per test.
+[[check]]
+runner  = "gotest"
+command = "bash \"$ENDLESS_VERIFY_DIR\"/gotest.sh"
+
+# The exported API is unchanged (P13), and the docs state the contract (P12, P14, P15).
+[[check]]
+runner  = "sh"
+command = "bash \"$ENDLESS_VERIFY_DIR\"/contract.sh"
+format  = "tap"

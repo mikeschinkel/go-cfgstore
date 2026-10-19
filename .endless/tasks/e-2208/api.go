@@ -48,6 +48,7 @@ func exported(fset *token.FileSet, d ast.Decl) (out []string) {
 			return nil
 		}
 		d.Doc, d.Body = nil, nil
+		d.Recv = unnamed(d.Recv)
 		out = append(out, render(fset, d))
 	case *ast.GenDecl:
 		for _, s := range d.Specs {
@@ -89,7 +90,22 @@ func exportedSpec(s ast.Spec) bool {
 	return false
 }
 
-// render prints n without comments.
+// unnamed drops parameter and result names, which are not part of the API,
+// keeping one field per name.
+func unnamed(fl *ast.FieldList) *ast.FieldList {
+	if fl == nil {
+		return nil
+	}
+	var list []*ast.Field
+	for _, f := range fl.List {
+		for range max(len(f.Names), 1) {
+			list = append(list, &ast.Field{Type: f.Type})
+		}
+	}
+	return &ast.FieldList{List: list}
+}
+
+// render prints n without comments, or parameter and result names.
 func render(fset *token.FileSet, n ast.Node) string {
 	ast.Inspect(n, func(n ast.Node) bool {
 		switch n := n.(type) {
@@ -99,6 +115,9 @@ func render(fset *token.FileSet, n ast.Node) string {
 			n.Doc, n.Comment = nil, nil
 		case *ast.ValueSpec:
 			n.Doc, n.Comment = nil, nil
+		case *ast.FuncType:
+			n.Params = unnamed(n.Params)
+			n.Results = unnamed(n.Results)
 		}
 		return true
 	})

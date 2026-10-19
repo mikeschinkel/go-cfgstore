@@ -1,0 +1,1 @@
+Duplicate of E-2208, which already covers mergeRootConfigs returning the unmerged layer; the user chose to plan the fix there.

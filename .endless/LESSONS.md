@@ -48,3 +48,7 @@ After E-2206 landed, Mike asked me to close the gaps it surfaced by landing, fol
 ### [2026-10-19] Prefer verify.toml manifests for task verify suites now that the runner has landed; installing the harness in a project is E-2349's job, not a task's
 E-2208: go-cfgstore had no _harness.sh, so I wrote a verify.toml suite, then on Mike's suggestion copied the harness and switched to verify.sh. Once I pointed out the manifest runner had landed (E-1602/E-1618; E-2206's verify.toml had passed through it), Mike said: 'If yes, I did not realize we could start using them. We should if we can.' Use a gotest check (with a command override when needed) plus sh/tap checks.
 - **Project**: go-cfgstore
+
+### [2026-10-19] In GetAppCacheDir Mike fixed a dropped error with named results (cachePath, err), var declarations and = assignments, not just by changing the return
+E-2208: lint flagged cache.go's GetAppCacheDir, which wrapped UserCacheDirFunc's error and then returned nil at end:. I changed only nil to err. Mike: 'the first is more than that', and gave his fix: named results (cachePath dt.DirPath, err error), var cacheDir dt.DirPath declared up front, cacheDir, err = ... with =, and return cachePath, err. He said this about that one function; ask before treating it as a general goto-end rule.
+- **Project**: go-cfgstore

@@ -1,0 +1,3 @@
+The main checkout has uncommitted work that was never committed or assigned to a task. Sibling repos that build against this checkout through a local replace directive pick up that work, so it can't simply be discarded, and main isn't a clean base for new tasks until it is sorted out.
+
+Found during E-2208 in go-cfgstore: its test module reaches go-testutil through a local replace, go-testutil's uncommitted main replaces go-cliutil and go-dt in turn, and the result does not build from go-cfgstore's main checkout. E-2208's verify suite works around it by building against go-testutil's committed HEAD.

@@ -33,6 +33,7 @@ needs a code change to compile.
 - xmlui's `svrcfg` loads `*RootConfigV1Wrapper`, which embeds `RootConfigV1`
   and has no `Merge` of its own. The promoted `(*RootConfigV1).Merge` returns
   the inner `*RootConfigV1`, so a two-layer load of it would fail with the new
-  error. None of its callers load two layers today; xmlui's own task gives the
-  wrapper its own `Merge`.
+  error. None of its callers load two layers today. xmlui is dormant and not an
+  Endless project, so nothing is filed for it; the fix, should it ever be
+  revived, is a `Merge` on the wrapper that returns a `*RootConfigV1Wrapper`.
 - doctool, macmail-ext, go-stash and gru never load through the generic loader.

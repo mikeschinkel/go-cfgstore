@@ -1,24 +1,43 @@
-# Fix mergeRootConfigs returning the unmerged project layer
+# Return the merged config from mergeRootConfigs
 
 ## The defect
 
 `mergeRootConfigs` (config_stores.go) folds each layer into `rc` with
-`rc = rcMap[typ].Merge(rc)`, then returns `prc = rcMap[dirType]`, which is the
-last layer as loaded, not the merged result. When a project config file
-exists, the caller gets the project layer alone, and every value meant to fall
-through from the CLI layer is lost. Endless confirmed it with a probe: with a
-project `config.json` present, `config.Load` returned `tracking=""` and
-`tmux.session_name=""`, although both were set in the user config.
+`rc = rcMap[typ].Merge(rc)`, then returns `prc = rcMap[dirType]`: the last
+layer as loaded, not the merged result. Whenever a project config exists, the
+caller gets the project layer alone, and every value meant to fall through from
+the CLI layer is lost.
 
-## Fix
+## Approach
 
-Return the merged `rc` (as the `PRC` type), not the receiver as loaded. Add a
-test in go-cfgstore: CLI layer sets a field, project layer sets a different
-one, and the result carries both, with project precedence on overlap.
+Move `Merge` off the `RootConfig` interface and onto the generic constraint
+`RootConfigPtr[RC]`, typed in the concrete config:
 
-## Then
+    type RootConfigPtr[RC any] interface {
+        RootConfig
+        *RC
+        Merge(other *RC) *RC
+    }
 
-Releasing the fix needs the dependency chain released first (its own task).
-Once go-cfgstore is tagged, Endless bumps it and re-checks that user-level
-`tracking`, `checks` and `tmux.session_name` reach a project that has its own
-config file. File that check as an `endless` task when this lands.
+`RootConfig` keeps `RootConfig()` and `Normalize(...)`, the methods the
+non-generic store code (`ensureConfig`, `loadConfigIfExists` and friends) uses.
+`mergeRootConfigs` then carries the merge in `PRC` from start to finish and
+returns it, so no runtime type conversion exists and a `Merge` with the wrong
+types fails to compile. A `nil` from `Merge` is the one runtime failure left;
+loading returns an error naming the layer.
+
+The single-layer path is unchanged: one loaded layer is returned as loaded,
+and `Merge` is not called. Merge order is unchanged: each later DirType's
+config receives the result so far as `other`.
+
+## Tests
+
+In `test/`, using a test config type:
+
+- two layers: a field set only in the CLI layer and one set only in the project
+  layer both reach the result; a field set in both takes the project's value;
+- three layers, checking that each `Merge` receives the result so far;
+- a `Merge` that copies and returns the copy, and one that edits its receiver
+  and returns it, giving the same result;
+- a `Merge` that returns nil, producing an error;
+- one layer, with `Merge` never called.

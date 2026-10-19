@@ -10,43 +10,33 @@ the CLI layer is lost.
 
 ## Approach
 
-Replace `Merge` on the `RootConfig` interface with `MergeFrom` on the generic
-constraint `RootConfigPtr[RC]`, typed in the concrete config:
+The exported API does not change: no method, type, constant or error is
+added, removed or re-signed.
 
-    type RootConfigPtr[RC any] interface {
-        RootConfig
-        *RC
-        MergeFrom(other *RC) *RC
-    }
+`mergeRootConfigs` returns the merged `rc`, converted back to the caller's
+`PRC`. When the conversion fails, because a `Merge` returned a different
+concrete type, or when `Merge` returned nil, loading returns an error wrapping
+the existing `ErrFailedToLoadConfig`. Its key-values name the DirType whose
+`Merge` produced it, the type that was expected, and the type that came back.
 
-`RootConfig` keeps `RootConfig()` and `Normalize(...)`, the methods the
-non-generic store code (`ensureConfig`, `loadConfigIfExists` and friends) uses.
-`mergeRootConfigs` then carries the merge in `PRC` from start to finish and
-returns it, so no runtime type conversion exists and a `MergeFrom` with the
-wrong types fails to compile. A `nil` from `MergeFrom` is the one runtime failure left;
-loading returns an error naming the layer.
+The doc comment on `RootConfig.Merge` states the contract the conversion
+relies on: `Merge` returns the merged config, as a value of its receiver's own
+concrete type, with the receiver's values taking precedence. The README's
+"Understanding Merge()" section says the same.
 
 The single-layer path is unchanged: one loaded layer is returned as loaded,
-and `MergeFrom` is not called. Merge order is unchanged: each later DirType's
+and `Merge` is not called. Merge order is unchanged: each later DirType's
 config receives the result so far as `other`.
 
 ## Tests
 
-In `test/`, using a test config type:
+In `test/`, using test config types:
 
 - two layers: a field set only in the CLI layer and one set only in the project
   layer both reach the result; a field set in both takes the project's value;
 - three layers, checking that each `Merge` receives the result so far;
 - a `Merge` that copies and returns the copy, and one that edits its receiver
   and returns it, giving the same result;
-- a `Merge` that returns nil, producing an error;
+- a `Merge` that returns another concrete type, and one that returns nil, each
+  producing the error above;
 - one layer, with `Merge` never called.
-
-## Order of landing
-
-The method gets a new name so Endless can adopt it before this lands. A type
-cannot carry two methods named `Merge` with different signatures, but an extra
-`MergeFrom` is harmless against today's go-cfgstore. So Endless's
-`EndlessConfig` gains `MergeFrom` in a task of its own that lands first, and
-this task lands after it. Endless builds against this checkout through a
-`replace`, so it never sees a go-cfgstore it cannot compile against.

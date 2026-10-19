@@ -73,8 +73,3 @@ statement = "The README's Understanding Merge() section states project-wins as t
 id = "P16"
 kind = "deliverable"
 statement = "GetAppCacheDir returns the error from UserCacheDirFunc instead of nil, using named results (cachePath, err), clearing the ineffassign lint failure at cache.go"
-
-[[item]]
-id = "P17"
-kind = "deliverable"
-statement = "Adds .endless/tasks/_harness.sh and _guard.sh to go-cfgstore, copied unchanged from endless, so E-2208's suite is a harness-based verify.sh"

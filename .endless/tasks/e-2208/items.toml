@@ -58,3 +58,8 @@ statement = "Does not add, remove or change the signature of any exported method
 id = "P9"
 kind = "exclusion"
 statement = "Does not tag or push a go-cfgstore release"
+
+[[item]]
+id = "P14"
+kind = "deliverable"
+statement = "The README's Wrapper Pattern example declares its own Merge, returning the wrapper type"

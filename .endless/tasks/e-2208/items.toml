@@ -23,7 +23,7 @@ verify = "a test in test/ recording what each Merge received"
 [[item]]
 id = "P4"
 kind = "deliverable"
-statement = "Merge is declared on RootConfigPtr as Merge(*RC) *RC and no longer on RootConfig, so a Merge that takes or returns another type fails to compile"
+statement = "The generic constraint RootConfigPtr requires MergeFrom(other *RC) *RC, and RootConfig no longer declares Merge, so a merge method that takes or returns another type fails to compile"
 
 [[item]]
 id = "P5"

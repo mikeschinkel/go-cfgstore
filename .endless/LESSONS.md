@@ -52,3 +52,7 @@ E-2208: go-cfgstore had no _harness.sh, so I wrote a verify.toml suite, then on 
 ### [2026-10-19] In GetAppCacheDir Mike fixed a dropped error with named results (cachePath, err), var declarations and = assignments, not just by changing the return
 E-2208: lint flagged cache.go's GetAppCacheDir, which wrapped UserCacheDirFunc's error and then returned nil at end:. I changed only nil to err. Mike: 'the first is more than that', and gave his fix: named results (cachePath dt.DirPath, err error), var cacheDir dt.DirPath declared up front, cacheDir, err = ... with =, and return cachePath, err. He said this about that one function; ask before treating it as a general goto-end rule.
 - **Project**: go-cfgstore
+
+### [2026-10-19] When another repo's state gets in the way of a task, file the upstream chain with blockers and expect Mike to want the current task blocked too, for urgency
+E-2208: go-cfgstore's test module didn't build because go-testutil, go-cliutil and go-dt had uncommitted main changes. I advised against blocking E-2208, since the fix didn't need them. Mike: 'cleaning those up should be fast, and I need urgency for that cleanup which blocking would provide.' He wants tasks filed up the dependency chain until one lands on its own, with blockers, and existing ones pointed out. He said this about a chain of fast cleanups; ask when the cleanup isn't fast.
+- **Project**: go-cfgstore

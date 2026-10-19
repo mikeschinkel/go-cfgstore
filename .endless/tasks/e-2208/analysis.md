@@ -1,4 +1,4 @@
-## Why Merge moves to the constraint
+## Why the merge method moves to the constraint
 
 `Merge(RootConfig) RootConfig` returns the interface, so any type implementing
 `RootConfig` is a legal return. Handing the result back as the caller's `PRC`
@@ -6,7 +6,7 @@ then needs a runtime conversion (`rc.(PRC)`), which fails for a `Merge` that
 returns a different concrete type. xmlui's `svrcfg` is one: it loads
 `*RootConfigV1Wrapper`, a struct that embeds `RootConfigV1` and has no `Merge`
 of its own, so the promoted `(*RootConfigV1).Merge` returns the inner
-`*RootConfigV1`. Declaring `Merge(*RC) *RC` on the constraint makes that a
+`*RootConfigV1`. Requiring `MergeFrom(*RC) *RC` on the constraint makes that a
 compile error, and leaves no conversion to fail.
 
 Rejected: keeping `Merge` on `RootConfig` and returning an error when the

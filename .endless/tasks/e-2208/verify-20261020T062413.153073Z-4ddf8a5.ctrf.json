@@ -1,0 +1,148 @@
+{
+  "results": {
+    "tool": {
+      "name": "endless"
+    },
+    "summary": {
+      "tests": 23,
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "other": 0,
+      "start": 1792477451673,
+      "stop": 1792477452933
+    },
+    "tests": [
+      {
+        "name": "TestGetAppCacheDir_ReturnsUserCacheDirError",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge/LoadDefaultConfig",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge/LoadConfigStores",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge/LoadConfig",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_EachMergeReceivesTheMergeOfEarlierLayers",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_InPlaceMergeMatchesCopyingMerge",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_MergeReturningAnotherTypeFails",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_MergeReturningNilFails/nil_RootConfig",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_MergeReturningNilFails/nil_pointer_of_the_config_type",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_MergeReturningNilFails",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_SingleLayerIsReturnedWithoutMerge/one_DirType",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_SingleLayerIsReturnedWithoutMerge/no_project_config_file",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "TestLoad_SingleLayerIsReturnedWithoutMerge",
+        "status": "passed",
+        "duration": 0,
+        "suite": "github.com/mikeschinkel/go-cfgstore/test"
+      },
+      {
+        "name": "P13: exported declarations match main",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: RootConfig.Merge's doc states the receiver's own concrete type",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: RootConfig.Merge's doc states the receiver's precedence",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: the README states Merge returns the receiver's own concrete type",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P14: the README's wrapper declares a Merge returning the wrapper",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: the README names the project-wins (the default) rule",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: the README names the project-only rule",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: the README names the global-only rule",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: the README names the global-wins rule",
+        "status": "passed",
+        "duration": 0
+      }
+    ]
+  }
+}

@@ -37,6 +37,4 @@ go.work.sum
 .endless/tmp/
 .endless/worktree.json
 .endless/worktree.lock
-
-# endless (managed by `endless project init`)
 .endless/logs/

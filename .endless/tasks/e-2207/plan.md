@@ -10,3 +10,8 @@ Both files predate Endless's task database.
 3. Show Mike the proposed list before filing.
 4. After filing, delete PLAN.md and TODO.md in the same commit that references
    the filed task ids.
+
+5. In the same step, remove the `TODO.md` line from go-cfgstore's
+   `.git/info/exclude`. It was added only to keep the file out of commits
+   until this task converts it (from E-2349); with the file gone it has no
+   purpose.

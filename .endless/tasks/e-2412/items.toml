@@ -60,3 +60,9 @@ kind = "deliverable"
 statement = "Every module's go directive is go 1.27.0, and the justfile, CI workflows and CLAUDE.md no longer set GOEXPERIMENT=jsonv2"
 verify = "go vet and go test pass on Go 1.27 with GOEXPERIMENT unset"
 detail = "User's choice for the pre-existing red regression: Go 1.27 refuses encoding/json/v2 under go 1.25.3"
+
+[[item]]
+id = "P13"
+kind = "deliverable"
+statement = "The justfile's golangci-lint is v2.15.0"
+detail = "v2.6.2 cannot read Go 1.27 export data"

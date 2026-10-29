@@ -53,3 +53,10 @@ statement = "Does not use git stash"
 id = "P11"
 kind = "deliverable"
 statement = "The report to the user groups the changes by module, each directory with its own go.mod being a separate, independently versioned module, and lists every module whose contents change"
+
+[[item]]
+id = "P12"
+kind = "deliverable"
+statement = "Every module's go directive is go 1.27.0, and the justfile, CI workflows and CLAUDE.md no longer set GOEXPERIMENT=jsonv2"
+verify = "go vet and go test pass on Go 1.27 with GOEXPERIMENT unset"
+detail = "User's choice for the pre-existing red regression: Go 1.27 refuses encoding/json/v2 under go 1.25.3"

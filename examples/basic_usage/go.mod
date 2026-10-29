@@ -1,6 +1,6 @@
 module basic_usage
 
-go 1.25.3
+go 1.27.0
 
 require github.com/mikeschinkel/go-cfgstore v0.4.0
 

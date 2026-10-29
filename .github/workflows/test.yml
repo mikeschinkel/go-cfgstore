@@ -7,8 +7,7 @@ on:
     branches: [ main, dev ]
 
 env:
-  GO_VERSION: '1.25'
-  GOEXPERIMENT: jsonv2
+  GO_VERSION: '1.27'
 
 jobs:
   # Fast tests that run on every commit/PR
@@ -39,11 +38,11 @@ jobs:
         run: go mod download
 
       - name: Run unit tests
-        run: GOEXPERIMENT=${{ env.GOEXPERIMENT }} go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
       - name: Run fuzz corpus regression tests
         working-directory: test
-        run: GOEXPERIMENT=${{ env.GOEXPERIMENT }} go test -v -run=TestFuzzCorpus
+        run: go test -v -run=TestFuzzCorpus
 
 
   # Note: For extended fuzzing, use the manual workflow or run locally with:
@@ -82,8 +81,8 @@ jobs:
         run: |
           go mod init example || true
           go mod edit -replace github.com/mikeschinkel/go-cfgstore=../..
-          GOEXPERIMENT=${{ env.GOEXPERIMENT }} go mod tidy
-          GOEXPERIMENT=${{ env.GOEXPERIMENT }} go build -v .
+          go mod tidy
+          go build -v .
 
   # Lint and static analysis
   lint:

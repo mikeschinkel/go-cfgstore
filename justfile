@@ -1,7 +1,4 @@
-linter := "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"
-
-# Go environment (requires jsonv2 experiment)
-export GOEXPERIMENT := env("GOEXPERIMENT", "jsonv2")
+linter := "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0"
 
 # List recipes
 default:

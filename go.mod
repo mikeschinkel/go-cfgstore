@@ -1,6 +1,6 @@
 module github.com/mikeschinkel/go-cfgstore
 
-go 1.25.3
+go 1.27.0
 
 require (
 	github.com/mikeschinkel/go-cliutil v0.3.0

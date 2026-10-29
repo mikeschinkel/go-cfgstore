@@ -29,9 +29,9 @@ func GetSharedCacheDir(slug dt.PathSegment, opts ...CacheOptions) (dt.DirPath, e
 //   - Windows: %LOCALAPPDATA%\{slug}\{appName}\
 //
 // Example: GetAppCacheDir("xmlui", "cli") → ~/.cache/xmlui/cli/ on Linux
-func GetAppCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (dt.DirPath, error) {
+func GetAppCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (cachePath dt.DirPath, err error) {
 	var dp *DirsProvider
-	var cachePath dt.DirPath
+	var cacheDir dt.DirPath
 
 	if len(opts) > 0 && opts[0].DirsProvider != nil {
 		dp = opts[0].DirsProvider
@@ -43,7 +43,7 @@ func GetAppCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (dt.DirP
 		}
 	}
 
-	cacheDir, err := dp.UserCacheDirFunc()
+	cacheDir, err = dp.UserCacheDirFunc()
 	if err != nil {
 		err = NewErr(ErrFailedGettingUserCacheDir, err)
 		goto end
@@ -76,5 +76,5 @@ func GetAppCacheDir(slug, appName dt.PathSegment, opts ...CacheOptions) (dt.DirP
 		cachePath = dt.DirPathJoin3(cacheDir, slug, appName)
 	}
 end:
-	return cachePath, nil
+	return cachePath, err
 }

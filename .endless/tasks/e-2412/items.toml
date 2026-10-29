@@ -66,3 +66,9 @@ id = "P13"
 kind = "deliverable"
 statement = "The justfile's golangci-lint is v2.15.0"
 detail = "v2.6.2 cannot read Go 1.27 export data"
+
+[[item]]
+id = "P14"
+kind = "deliverable"
+statement = "doterr.go is re-synced from go-doterr after E-2383 lands, and just lint passes"
+detail = "Clears staticcheck QF1012 at doterr.go:592; E-2383 blocks this task by the user's choice"

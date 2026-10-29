@@ -1,0 +1,1 @@
+go vet ./... in examples/basic_usage fails with 'fmt.Println arg list ends with redundant newline' on the underline printed under the example's heading. The module builds and runs; only vet fails, so the module can't pass a vet-clean check.

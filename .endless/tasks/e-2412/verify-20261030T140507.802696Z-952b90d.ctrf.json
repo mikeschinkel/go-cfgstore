@@ -1,0 +1,502 @@
+{
+  "reportFormat": "CTRF",
+  "specVersion": "0.2.0",
+  "results": {
+    "tool": {
+      "name": "endless"
+    },
+    "summary": {
+      "tests": 71,
+      "passed": 71,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "other": 0,
+      "start": 1793369088941,
+      "stop": 1793369090656
+    },
+    "tests": [
+      {
+        "name": "TestConfigStore_SaveLoadExists",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestConfigStore_LoadNonexistent",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestConfigStore_SaveInvalidJSON",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestConfigStore_ConfigDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestConfigStores_CLIAndProjectStores",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestConfigStore_LoadFromPreCreatedFixture",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestFuzzCorpus",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_UserHomeDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_UserConfigDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_ProjectDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_Getwd",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestTestDirsProviderArgs_GetTestRoot",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestTestDirsProviderArgs_WithoutTestRoot",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestTestDirsProviderArgs_TestRootFunc",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestTestDirsProviderArgs_RelConfigDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_EmptyUsername",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_InvalidUsername",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "TestNewTestDirsProvider_EmptyProjectDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#0",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#1",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#2",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#3",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#4",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#5",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#6",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#7",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#8",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#9",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#10",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#11",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#12",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#13",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewCLIConfigStore",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#0",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#1",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#2",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#3",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#4",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#5",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#6",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#7",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "FuzzNewProjectConfigStore",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ]
+      },
+      {
+        "name": "P1: wip/e-2412 is one WIP commit",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P1: the snapshot touches cache.go, test/go.mod and test/go.sum",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P4: commit \"return GetAppCacheDir's error instead of nil\"",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P4: commit \"bump test module to go-dt v0.6.1 to match go-testutil\"",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P4: commit \"require Go 1.27 and drop the jsonv2 experiment\"",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P4: commit \"re-sync doterr.go from go-doterr\"",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P4: commit \"bring go-cfgstore to the go-pkgs package baseline\"",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: go.mod says go 1.27.0",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: test/go.mod says go 1.27.0",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: examples/basic_usage/go.mod says go 1.27.0",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: justfile and workflows do not set GOEXPERIMENT",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P12: CLAUDE.md says the modules require Go 1.27",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "test/go.mod requires go-dt v0.6.1",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P10: root module builds",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P10: root module vets clean",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P10: examples/basic_usage builds",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P13: justfile pins golangci-lint v2.15.0",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P14: golangci-lint passes on the root module",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: golangci-lint passes on examples/basic_usage",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: golangci-lint passes on the test module",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: release notes exclude .endless",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: /bin/ is gitignored",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: nothing under bin/ is tracked",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: the example's binary is gitignored",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: .endless/worktrees/ is gitignored",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: .endless/tmp/ is gitignored",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: .endless/logs/ is gitignored",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: .endless/worktree.json is gitignored",
+        "status": "passed",
+        "duration": 0
+      },
+      {
+        "name": "P15: .endless/worktree.lock is gitignored",
+        "status": "passed",
+        "duration": 0
+      }
+    ]
+  }
+}

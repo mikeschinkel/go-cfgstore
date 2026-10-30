@@ -72,3 +72,9 @@ id = "P14"
 kind = "deliverable"
 statement = "doterr.go is re-synced from go-doterr after E-2383 lands, and just lint passes"
 detail = "Clears staticcheck QF1012 at doterr.go:592; E-2383 blocks this task by the user's choice"
+
+[[item]]
+id = "P15"
+kind = "deliverable"
+statement = "go-cfgstore meets the go-pkgs package baseline: every module lints clean with golangci-lint v2.15.0, the Release workflow's commit list excludes .endless, /bin/ is gitignored with nothing tracked under it, and Endless's per-checkout files are gitignored"
+detail = "go-pkgs CLAUDE.md puts the baseline in scope for any task touching a package"

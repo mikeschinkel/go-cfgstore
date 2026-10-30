@@ -1,7 +1,6 @@
 package test
 
 import (
-	"log/slog"
 	"os"
 	"testing"
 
@@ -12,10 +11,9 @@ import (
 var bufferedLog *testutil.BufferedLogHandler
 
 func TestMain(m *testing.M) {
-	var logger *slog.Logger
 	// Setup code here if needed
 	// For example: initialize test data, mock services, etc.
-	logger = testutil.GetBufferedLogger()
+	logger := testutil.GetBufferedLogger()
 	bufferedLog = testutil.GetBufferedLogHandler()
 
 	cfgstore.SetLogger(logger)

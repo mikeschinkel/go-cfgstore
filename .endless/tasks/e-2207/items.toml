@@ -27,3 +27,8 @@ statement = "Mike approved the proposed list before any task was filed"
 id = "P5"
 kind = "deliverable"
 statement = "PLAN.md and TODO.md are deleted in one commit whose message names the filed task ids"
+
+[[item]]
+id = "P6"
+kind = "deliverable"
+statement = "go-cfgstore's .git/info/exclude no longer lists TODO.md"

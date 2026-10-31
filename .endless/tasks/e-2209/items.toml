@@ -12,3 +12,9 @@ id = "P2"
 kind = "deliverable"
 statement = "go-cfgstore's root go.mod requires published versions only and has no replace directive; test/ and examples/ modules may keep a replace pointing at ../"
 verify = "grep replace go.mod; GOWORK=off go build ./..."
+
+[[item]]
+id = "P3"
+kind = "deliverable"
+statement = "go-cfgstore builds and passes its tests with GOWORK=off"
+verify = "GOWORK=off just test"

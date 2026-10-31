@@ -6,3 +6,9 @@
 id = "P1"
 kind = "deliverable"
 statement = "release.yml's generated release notes leave out commits that change only files under .endless/, using the git log pathspec ':(exclude).endless' as go-dt's release.yml does"
+
+[[item]]
+id = "P2"
+kind = "deliverable"
+statement = "Every item in PLAN.md and TODO.md has a recorded disposition: verified done, filed as a go-cfgstore task, or moved to adrs/ or the README"
+verify = "a disposition list in the task outcome, one line per source item"

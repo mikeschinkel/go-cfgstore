@@ -17,3 +17,8 @@ verify = "a disposition list in the task outcome, one line per source item"
 id = "P3"
 kind = "deliverable"
 statement = "Items that share a root cause are filed as one task"
+
+[[item]]
+id = "P4"
+kind = "deliverable"
+statement = "Mike approved the proposed list before any task was filed"

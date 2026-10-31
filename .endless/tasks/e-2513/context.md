@@ -1,0 +1,1 @@
+Carried over from the old TODO.md: 'Consider renaming CLIConfig to UserConfig.' The CLIConfig names are still used across config_store.go, config_dir.go and config_stores.go. A rename breaks the public API.

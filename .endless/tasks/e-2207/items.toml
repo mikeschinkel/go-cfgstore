@@ -36,4 +36,4 @@ statement = "go-cfgstore's .git/info/exclude no longer lists TODO.md"
 [[item]]
 id = "P7"
 kind = "exclusion"
-statement = "Does not port adrs/ into Endless decisions; that waits for the new decision workflow"
+statement = "Adds no files to adrs/ and does not convert its existing files into Endless decisions"

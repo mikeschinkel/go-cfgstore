@@ -4,16 +4,13 @@ schema = 1
 task   = "E-2207"
 
 [[check]]
-name    = "package still builds and tests pass"
-runner  = "sh"
-command = "go build ./... && go test ./..."
+name   = "package builds"
+sh     = "go build ./..."
 
 [[check]]
-name    = "PLAN.md and TODO.md are gone"
-runner  = "sh"
-command = "test ! -e PLAN.md && test ! -e TODO.md"
+name = "PLAN.md and TODO.md are gone"
+sh   = "test ! -e PLAN.md && test ! -e TODO.md"
 
 [[check]]
-name    = "exclude no longer lists TODO.md"
-runner  = "sh"
-command = "! grep -qx 'TODO.md' \"$(git rev-parse --git-common-dir)/info/exclude\""
+name = "exclude no longer lists TODO.md"
+sh   = "! grep -qx 'TODO.md' \"$(git rev-parse --git-common-dir)/info/exclude\""

@@ -5,7 +5,7 @@
 [[item]]
 id = "P1"
 kind = "deliverable"
-statement = "Every module go-cfgstore depends on, leaves first, that changed since its last tag carries a new tag on its remote, each approved by Mike before the push"
+statement = "Every module go-cfgstore depends on, leaves first, that changed since its last tag is ready for a release: its work is committed and pushed, and Mike has the proposed version and a release description in active voice, with code and slugs in backticks"
 
 [[item]]
 id = "P2"

@@ -17,7 +17,8 @@ func main() {
 	cfgstore.SetLogger(slog.Default())
 
 	fmt.Println("go-cfgstore Basic Usage Example")
-	fmt.Println("================================\n")
+	fmt.Println("================================")
+	fmt.Println()
 
 	// Create a CLI config store at ~/.config/myapp/config.json
 	// NOTE: Each "store" is a single file within a config directory

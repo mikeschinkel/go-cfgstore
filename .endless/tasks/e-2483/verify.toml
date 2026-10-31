@@ -1,0 +1,30 @@
+# Verification suite for E-2483 — fix go vet's redundant-newline finding in the example.
+# DO NOT EDIT unless you ARE E-2483. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2483"
+
+# The project's native tests first, fail-fast: the test module, built through a
+# scratch -modfile because its go-testutil replace only resolves from main.
+[[check]]
+name    = "test module unit tests"
+runner  = "gotest"
+command = "bash \"$ENDLESS_VERIFY_DIR\"/gotest.sh"
+
+# P1: go vet reports nothing for the example module.
+[[check]]
+name   = "P1: go vet ./... in examples/basic_usage reports no findings"
+dir    = "examples/basic_usage"
+sh     = "GOWORK=off go vet ./... 2>&1"
+equals = ""
+
+# Plan step 2: the example module still builds.
+[[check]]
+name = "examples/basic_usage builds"
+dir  = "examples/basic_usage"
+sh   = "GOWORK=off go build -o /dev/null ./..."
+
+# P2: the example prints exactly what the pre-change source printed.
+[[check]]
+name = "P2: example output is unchanged from the pre-change source"
+sh   = "bash \"$ENDLESS_VERIFY_DIR\"/output.sh"

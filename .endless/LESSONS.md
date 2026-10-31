@@ -84,3 +84,7 @@ While adding plan items to go-cfgstore's E-2207 (convert PLAN.md and TODO.md), I
 ### [2026-10-31] Another project's uncommitted or unreleased work belongs to a session for that project
 In E-2209 the plan said to check each dependency for uncommitted work and commit it. I proposed committing and tagging go-logutil's uncommitted work myself. Mike corrected me: work in another project, such as go-logutil, is managed by a task in that project (here E-2376), never by the session releasing a dependent. Delegate it to that project and block my task on its task; do not commit, land or tag that project's in-flight work, even when my own plan appears to say so.
 - **Project**: go-cfgstore
+
+### [2026-10-31] A file hidden by .git/info/exclude is invisible to git status; check with ls before claiming it is absent
+On E-2207 I told Mike TODO.md did not exist because git status showed nothing. An exclude entry hid it, and removing the entry made it untracked and block the land. Next time: ls the main checkout before saying a file is absent, and treat an exclude line as hiding a file that may still be there.
+- **Project**: go-cfgstore

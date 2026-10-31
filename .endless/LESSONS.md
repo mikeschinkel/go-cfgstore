@@ -76,3 +76,7 @@ After E-2206 landed in go-cfgstore, I told Mike to run 'endless worktree drop E-
 ### [2026-10-31] A session stewards its unspawned tasks
 After E-2206 landed, I told Mike the session had nothing left and could be closed. He corrected me: a session's purpose includes stewarding the unspawned tasks in its session status (endless guide sessions, 'Focus, and a task's steward': the steward keeps a task in view so it gets spawned or rejected). A landed claimed task does not end the session's job; check session status for stewarded tasks first.
 - **Project**: go-cfgstore
+
+### [2026-10-31] adrs/ is deprecated; decisions live in Endless
+While adding plan items to go-cfgstore's E-2207 (convert PLAN.md and TODO.md), I offered 'move it to adrs/ or the README' as a disposition. Mike: adrs/ is deprecated; design records are Endless decisions now, existing adrs/ will be converted later, and no new ADR files get added. He also said an item from PLAN.md or TODO.md is very unlikely to belong in a README.
+- **Project**: go-cfgstore

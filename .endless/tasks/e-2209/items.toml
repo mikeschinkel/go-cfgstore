@@ -6,3 +6,9 @@
 id = "P1"
 kind = "deliverable"
 statement = "Every module go-cfgstore depends on, leaves first, that changed since its last tag carries a new tag on its remote, each approved by Mike before the push"
+
+[[item]]
+id = "P2"
+kind = "deliverable"
+statement = "go-cfgstore's root go.mod requires published versions only and has no replace directive; test/ and examples/ modules may keep a replace pointing at ../"
+verify = "grep replace go.mod; GOWORK=off go build ./..."

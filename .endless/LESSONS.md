@@ -72,3 +72,7 @@ In E-2208 I merged main into task/2208 to re-check it against E-2412's changes. 
 ### [2026-10-31] Never suggest dropping a worktree
 After E-2206 landed in go-cfgstore, I told Mike to run 'endless worktree drop E-2206' (and E-2208's) as a next step. He said never suggest it: dropping a worktree pulls the floor out from under the session standing in it. The guide only says not to run land or drop without asking; Mike's rule is stronger: don't propose it at all.
 - **Project**: go-cfgstore
+
+### [2026-10-31] A session stewards its unspawned tasks
+After E-2206 landed, I told Mike the session had nothing left and could be closed. He corrected me: a session's purpose includes stewarding the unspawned tasks in its session status (endless guide sessions, 'Focus, and a task's steward': the steward keeps a task in view so it gets spawned or rejected). A landed claimed task does not end the session's job; check session status for stewarded tasks first.
+- **Project**: go-cfgstore

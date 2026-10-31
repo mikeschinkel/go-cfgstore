@@ -23,3 +23,9 @@ verify = "GOWORK=off just test"
 id = "P4"
 kind = "deliverable"
 statement = "go-cfgstore carries a new tag at the released commit"
+
+[[item]]
+id = "P5"
+kind = "deliverable"
+statement = "Every step done by hand in the release, and why, is recorded on E-2347"
+verify = "endless task show E-2347 --all-fields"

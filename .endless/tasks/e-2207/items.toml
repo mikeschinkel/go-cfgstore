@@ -12,3 +12,8 @@ id = "P2"
 kind = "deliverable"
 statement = "Every item in PLAN.md and TODO.md has a recorded disposition: verified done, filed as a go-cfgstore task, or moved to adrs/ or the README"
 verify = "a disposition list in the task outcome, one line per source item"
+
+[[item]]
+id = "P3"
+kind = "deliverable"
+statement = "Items that share a root cause are filed as one task"

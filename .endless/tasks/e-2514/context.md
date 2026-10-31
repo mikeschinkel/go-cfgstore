@@ -1,0 +1,1 @@
+Carried over from the old TODO.md. Normalize is still called from config_store.go during load and save.

@@ -1,0 +1,19 @@
+# Verification suite for E-2207 — convert PLAN.md and TODO.md into tasks.
+# DO NOT EDIT unless you ARE E-2207. See .endless/tasks/CLAUDE.md.
+schema = 1
+task   = "E-2207"
+
+[[check]]
+name    = "package still builds and tests pass"
+runner  = "sh"
+command = "go build ./... && go test ./..."
+
+[[check]]
+name    = "PLAN.md and TODO.md are gone"
+runner  = "sh"
+command = "test ! -e PLAN.md && test ! -e TODO.md"
+
+[[check]]
+name    = "exclude no longer lists TODO.md"
+runner  = "sh"
+command = "! grep -qx 'TODO.md' \"$(git rev-parse --git-common-dir)/info/exclude\""

@@ -1,0 +1,45 @@
+{
+  "reportFormat": "CTRF",
+  "specVersion": "0.2.0",
+  "results": {
+    "tool": {
+      "name": "endless"
+    },
+    "summary": {
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "other": 0,
+      "start": 1793479212797,
+      "stop": 1793479213089
+    },
+    "tests": [
+      {
+        "name": "package builds",
+        "status": "passed",
+        "duration": 274,
+        "labels": {
+          "check": "package builds"
+        }
+      },
+      {
+        "name": "PLAN.md and TODO.md are gone",
+        "status": "passed",
+        "duration": 4,
+        "labels": {
+          "check": "PLAN.md and TODO.md are gone"
+        }
+      },
+      {
+        "name": "exclude no longer lists TODO.md",
+        "status": "passed",
+        "duration": 12,
+        "labels": {
+          "check": "exclude no longer lists TODO.md"
+        }
+      }
+    ]
+  }
+}

@@ -22,7 +22,7 @@ verify = "GOWORK=off just test"
 [[item]]
 id = "P4"
 kind = "deliverable"
-statement = "go-cfgstore carries a new tag at the released commit"
+statement = "Mike has the proposed go-cfgstore version and release description, and go-cfgstore carries a new tag at the released commit once he runs its Release workflow"
 
 [[item]]
 id = "P5"

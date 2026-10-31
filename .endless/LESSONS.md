@@ -68,3 +68,7 @@ E-2208 follow-up: planning the go-dt cleanup task (E-2375), Mike pointed out tha
 ### [2026-10-30] Bring a task branch up to main by rebasing, not merging
 In E-2208 I merged main into task/2208 to re-check it against E-2412's changes. endless worktree land then refused: the merge commit carried main's .endless/db-ledger/ lines, and a branch commit that modifies the ledger cannot land. Rebasing onto main (git rebase main) replays only the branch's own commits, drops the merge, and leaves the code tree identical; the SHA change sends the task back to unverified, so it needs verifying again.
 - **Project**: go-cfgstore
+
+### [2026-10-31] Never suggest dropping a worktree
+After E-2206 landed in go-cfgstore, I told Mike to run 'endless worktree drop E-2206' (and E-2208's) as a next step. He said never suggest it: dropping a worktree pulls the floor out from under the session standing in it. The guide only says not to run land or drop without asking; Mike's rule is stronger: don't propose it at all.
+- **Project**: go-cfgstore

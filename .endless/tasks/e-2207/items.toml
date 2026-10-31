@@ -3,11 +3,6 @@
 #   endless task update E-2207 --items-file <copy>
 
 [[item]]
-id = "P1"
-kind = "deliverable"
-statement = "release.yml's generated release notes leave out commits that change only files under .endless/, using the git log pathspec ':(exclude).endless' as go-dt's release.yml does"
-
-[[item]]
 id = "P2"
 kind = "deliverable"
 statement = "Every item in PLAN.md and TODO.md has a recorded disposition: verified done, filed as a go-cfgstore task, or recorded as an Endless decision; none goes into the README without a stated reason"

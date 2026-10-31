@@ -29,3 +29,8 @@ id = "P5"
 kind = "deliverable"
 statement = "Every step done by hand in the release, and why, is recorded on E-2347"
 verify = "endless task show E-2347 --all-fields"
+
+[[item]]
+id = "P6"
+kind = "exclusion"
+statement = "Does not change the code of any dependency beyond what is needed to commit and release its existing work"

@@ -18,3 +18,8 @@ id = "P3"
 kind = "deliverable"
 statement = "go-cfgstore builds and passes its tests with GOWORK=off"
 verify = "GOWORK=off just test"
+
+[[item]]
+id = "P4"
+kind = "deliverable"
+statement = "go-cfgstore carries a new tag at the released commit"

@@ -10,7 +10,7 @@ statement = "release.yml's generated release notes leave out commits that change
 [[item]]
 id = "P2"
 kind = "deliverable"
-statement = "Every item in PLAN.md and TODO.md has a recorded disposition: verified done, filed as a go-cfgstore task, or moved to adrs/ or the README"
+statement = "Every item in PLAN.md and TODO.md has a recorded disposition: verified done, filed as a go-cfgstore task, or recorded as an Endless decision; none goes into the README without a stated reason"
 verify = "a disposition list in the task outcome, one line per source item"
 
 [[item]]

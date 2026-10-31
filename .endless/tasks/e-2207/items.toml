@@ -22,3 +22,8 @@ statement = "Items that share a root cause are filed as one task"
 id = "P4"
 kind = "deliverable"
 statement = "Mike approved the proposed list before any task was filed"
+
+[[item]]
+id = "P5"
+kind = "deliverable"
+statement = "PLAN.md and TODO.md are deleted in one commit whose message names the filed task ids"

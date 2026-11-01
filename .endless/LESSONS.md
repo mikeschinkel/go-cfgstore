@@ -100,3 +100,7 @@ On E-2351 (go-cfgstore) the plan named go-dt v0.7.0 and dtx v0.3.0. The session 
 ### [2026-10-31] Version numbers in a plan are not gospel; bump dependencies to their most recent releases
 While doing E-2352 (TruncateLog in go-cfgstore) the plan named go-dt v0.7.0, and I treated that and the other pinned versions as exact requirements, filing reconcile discrepancies and asking Mike to approve each dependency bump the build forced. Mike said this was pedantic: another session wrote those numbers, and the bigger picture is what matters. When a task touches a module's dependencies, update all of them to their most recent releases and get on with the work, rather than asking for permission version by version.
 - **Project**: go-cfgstore
+
+### [2026-10-31] An unpublished dependency is a blocker to name, not a limitation to report
+On E-2351 (go-cfgstore) the session reported that test/go.mod still reached go-testutil v0.3.0 through a replace because v0.3.0 was unpublished, and attributed publishing it to E-2209 as if that closed the matter. Mike: NO. Tell him which task lands and publishes it is a blocker, and he will land and publish it. When a dependency the task needs is unpublished, find the task that releases it, name it as a blocker (and record the blocked_by relation), so he can act, rather than leaving a replace in place and calling it someone else's scope.
+- **Project**: go-cfgstore

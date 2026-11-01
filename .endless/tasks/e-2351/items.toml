@@ -38,4 +38,4 @@ statement = "Does not commit the PLAN.md parked on wip/e2351-e2352, nor the Trun
 [[item]]
 id = "P7"
 kind = "deliverable"
-statement = "The root and examples/basic_usage/ go.mod files require go-cliutil v0.4.0, because v0.3.0 calls dt.LogOnError, which go-dt v0.7.0 no longer exports"
+statement = "Every dependency in the root, test/ and examples/basic_usage/ go.mod files is at its latest published release (go get -u), including go-cliutil v0.4.0, which go-dt v0.7.0 requires because v0.3.0 calls the renamed dt.LogOnError"

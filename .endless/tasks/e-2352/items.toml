@@ -36,3 +36,8 @@ statement = "Does not change go-logutil or resolve the TODO about CreateJSONFile
 id = "P7"
 kind = "deliverable"
 statement = "go.mod requires go-cliutil v0.4.0 and dtx v0.3.0, because v0.3.0 and v0.2.1 do not compile against go-dt v0.7.0"
+
+[[item]]
+id = "P8"
+kind = "deliverable"
+statement = "test/go.mod and examples/basic_usage/go.mod require the same go-dt v0.7.0, dtx v0.3.0 and go-cliutil v0.4.0 as the root module, so every module builds with GOWORK=off"

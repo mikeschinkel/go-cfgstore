@@ -2,6 +2,7 @@ package cfgstore
 
 import (
 	"errors"
+	"io/fs"
 	"log/slog"
 	"os"
 
@@ -14,10 +15,11 @@ var ErrFailedWriterSetup = errors.New("failed writer setup")
 var ErrFailedLoggerSetup = errors.New("failed logger setup")
 
 type WriterLoggerArgs struct {
-	Quiet      bool
-	Verbosity  cliutil.Verbosity
-	ConfigSlug dt.PathSegment
-	LogFile    dt.RelFilepath
+	Quiet       bool
+	Verbosity   cliutil.Verbosity
+	ConfigSlug  dt.PathSegment
+	LogFile     dt.RelFilepath
+	TruncateLog bool // Remove the log file before the logger opens it, so the log starts empty.
 }
 
 func CreateWriterLogger(args *WriterLoggerArgs) (wr cliutil.WriterLogger, err error) {
@@ -80,6 +82,14 @@ func createLogger(logDir dt.DirPath, writer cliutil.Writer, args *WriterLoggerAr
 		goto end
 	}
 	fp = dt.FilepathJoin(logDir, args.LogFile)
+	if args.TruncateLog {
+		err = truncateLog(fp)
+		if err != nil {
+			goto end
+		}
+	}
+	// TODO Add args to logutil.CreateJSONFileLogger so it can open the file with
+	//      truncation, in place of truncateLog() removing it first.
 	logger, err = logutil.CreateJSONFileLogger(fp)
 	if err != nil {
 		err = dt.NewErr(dt.ErrFailedtoCreateFile,
@@ -94,4 +104,20 @@ end:
 		err = dt.WithErr(err, ErrFailedLoggerSetup)
 	}
 	return logger, err
+}
+
+// truncateLog removes the log file so the logger starts it empty. A log file
+// that does not exist yet has nothing to truncate, so that is not an error.
+func truncateLog(fp dt.Filepath) (err error) {
+	err = fp.Remove()
+	if err == nil {
+		goto end
+	}
+	if errors.Is(err, fs.ErrNotExist) {
+		err = nil
+		goto end
+	}
+	err = dt.NewErr(dt.ErrFailedtoRemoveFile, fp.ErrKV(), err)
+end:
+	return err
 }

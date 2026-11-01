@@ -1,0 +1,71 @@
+# Verification suite for E-2352 — add a TruncateLog option to the writer logger.
+# DO NOT EDIT unless you ARE E-2352. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2352"
+
+# E-2352's own test first, fail-fast (P1, P2, P3): TruncateLog with no log file
+# yet, with an existing one, and the existing one kept without TruncateLog. The
+# test module builds through a scratch -modfile because its go-testutil replace
+# only resolves from main.
+[[check]]
+name    = "P1-P3: TestCreateWriterLogger_TruncateLog"
+runner  = "gotest"
+command = "bash \"$ENDLESS_VERIFY_DIR\"/testmod.sh own"
+
+# P1: the field exists on WriterLoggerArgs.
+[[check]]
+name   = "P1: WriterLoggerArgs declares TruncateLog bool"
+sh     = "awk '/^type WriterLoggerArgs struct/,/^}/' writer_logger.go | grep -cE '^\\s*TruncateLog\\s+bool'"
+equals = "1"
+
+# P4: go-dt v0.7.0 or later, in every module.
+[[check]]
+name   = "P4: root go.mod requires go-dt v0.7.0"
+sh     = "GOWORK=off go list -m -f '{{.Version}}' github.com/mikeschinkel/go-dt"
+equals = "v0.7.0"
+
+[[check]]
+name   = "P4: test/go.mod requires go-dt v0.7.0"
+sh     = "grep -cE '^\\s*github.com/mikeschinkel/go-dt v0\\.7\\.0$' test/go.mod"
+equals = "1"
+
+[[check]]
+name   = "P4 (grown): examples/basic_usage/go.mod requires go-dt v0.7.0"
+sh     = "grep -cE '^\\s*github.com/mikeschinkel/go-dt v0\\.7\\.0( // indirect)?$' examples/basic_usage/go.mod"
+equals = "1"
+
+[[check]]
+name = "P4: no replace directive in root go.mod"
+sh   = "! grep -q '^replace' go.mod"
+
+# P5: build, vet and tests pass with GOWORK=off in every module.
+[[check]]
+name = "P5: root module builds, vets and tests with GOWORK=off"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./... && GOWORK=off go test -race -count=1 ./..."
+
+[[check]]
+name = "P5: examples/basic_usage builds and vets with GOWORK=off"
+dir  = "examples/basic_usage"
+sh   = "GOWORK=off go build -o /dev/null ./... && GOWORK=off go vet ./..."
+
+[[check]]
+name = "P5: test module builds and vets with GOWORK=off"
+sh   = "bash \"$ENDLESS_VERIFY_DIR\"/testmod.sh vet"
+
+[[check]]
+name    = "P5: test module unit tests pass with GOWORK=off"
+runner  = "gotest"
+command = "bash \"$ENDLESS_VERIFY_DIR\"/testmod.sh test"
+
+# P6 (exclusion): go-logutil is untouched and the TODO about
+# CreateJSONFileLogger taking a truncation option is still open.
+[[check]]
+name   = "P6: go-logutil stays at v0.2.1"
+sh     = "GOWORK=off go list -m -f '{{.Version}}' github.com/mikeschinkel/go-logutil"
+equals = "v0.2.1"
+
+[[check]]
+name   = "P6: the CreateJSONFileLogger truncation TODO is still in writer_logger.go"
+sh     = "grep -c 'TODO Add args to logutil.CreateJSONFileLogger' writer_logger.go"
+equals = "1"

@@ -5,13 +5,12 @@ schema = 1
 task   = "E-2352"
 
 # E-2352's own test first, fail-fast (P1, P2, P3): TruncateLog with no log file
-# yet, with an existing one, and the existing one kept without TruncateLog. The
-# test module builds through a scratch -modfile because its go-testutil replace
-# only resolves from main.
+# yet, with an existing one, and the existing one kept without TruncateLog.
 [[check]]
 name    = "P1-P3: TestCreateWriterLogger_TruncateLog"
 runner  = "gotest"
-command = "bash \"$ENDLESS_VERIFY_DIR\"/testmod.sh own"
+dir     = "test"
+command = "GOWORK=off go test -json -race -count=1 -run '^TestCreateWriterLogger_TruncateLog$' ./..."
 
 # P1: the field exists on WriterLoggerArgs.
 [[check]]
@@ -51,12 +50,20 @@ sh   = "GOWORK=off go build -o /dev/null ./... && GOWORK=off go vet ./..."
 
 [[check]]
 name = "P5: test module builds and vets with GOWORK=off"
-sh   = "bash \"$ENDLESS_VERIFY_DIR\"/testmod.sh vet"
+dir  = "test"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
 
 [[check]]
 name    = "P5: test module unit tests pass with GOWORK=off"
 runner  = "gotest"
-command = "bash \"$ENDLESS_VERIFY_DIR\"/testmod.sh test"
+dir     = "test"
+command = "GOWORK=off go test -json -race -count=1 ./..."
+
+# P10 (grown): test/go.mod reaches go-testutil v0.3.0 from the proxy, with no
+# replace, so the module builds from any checkout.
+[[check]]
+name = "P10: test/go.mod has no go-testutil replace"
+sh   = "! grep -q 'replace github.com/mikeschinkel/go-testutil' test/go.mod"
 
 # P6 (exclusion): go-logutil is untouched and the TODO about
 # CreateJSONFileLogger taking a truncation option is still open.

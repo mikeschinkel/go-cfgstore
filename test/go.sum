@@ -10,6 +10,8 @@ github.com/mikeschinkel/go-dt/dtx v0.3.0 h1:l79W8TEsP0qAbkAN17WAM64A8LCFRyvBVrIU
 github.com/mikeschinkel/go-dt/dtx v0.3.0/go.mod h1:pYiPW8ae5JJPLWihw9gBt8xrMrWB7wrT3A7t4HSznz0=
 github.com/mikeschinkel/go-logutil v0.2.1 h1:jYwZCRSA/rlXXNP4grOerzTkMx1OcLZQjarjSJqVFzg=
 github.com/mikeschinkel/go-logutil v0.2.1/go.mod h1:1yNSU+v0f+8anOjTq8hvHG7/A2FcRfVmXfnHTorHNk4=
+github.com/mikeschinkel/go-testutil v0.3.0 h1:tJg58ReZZjkyrnrIObiJ8VEuScZz5/7eLXbWYXmhboU=
+github.com/mikeschinkel/go-testutil v0.3.0/go.mod h1:Xqst3CdIS6PZw/xybg+ra46kL5obMjU0c8ccSsZu7lY=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 go.yaml.in/yaml/v3 v3.0.6 h1:zcDfvjXEqTQmpjniUBLc91xYJMB2c4QOFxEF/LCEckM=

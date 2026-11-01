@@ -21,5 +21,3 @@ require (
 )
 
 replace github.com/mikeschinkel/go-cfgstore => ..
-
-replace github.com/mikeschinkel/go-testutil => ../../../go-pkgs/go-testutil

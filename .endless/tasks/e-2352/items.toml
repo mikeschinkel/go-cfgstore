@@ -46,3 +46,8 @@ statement = "test/go.mod and examples/basic_usage/go.mod require the same go-dt 
 id = "P9"
 kind = "deliverable"
 statement = "Every module's dependencies are at their most recent releases (Mike's direction on EQ-224/EQ-225)"
+
+[[item]]
+id = "P10"
+kind = "deliverable"
+statement = "test/go.mod requires go-testutil v0.3.0 from the proxy with no replace directive, so the test module builds from any checkout"

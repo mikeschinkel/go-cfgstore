@@ -96,3 +96,7 @@ While reconciling E-2351 in go-cfgstore, Mike asked whether Claude had removed d
 ### [2026-10-31] Dependency bumps mean all deps to latest; plan version numbers are floors, not specs
 On E-2351 (go-cfgstore) the plan named go-dt v0.7.0 and dtx v0.3.0. The session pinned exactly those, hit a compile break in go-cliutil v0.3.0, bumped only go-cliutil, and then stopped to file a reconcile question asking whether that one bump was allowed. Mike: he does not care about specific versions in go.mod, he wants ALL versions updated to the most recent, and treating a plan's version detail as authoritative instead of seeing the bigger picture (make the module build and current) turned a few hours of work into days. When a task touches go.mod, run go get -u across every module, tidy, and move on; do not ask whether a dependency bump that the build requires is permitted.
 - **Project**: go-cfgstore
+
+### [2026-10-31] Version numbers in a plan are not gospel; bump dependencies to their most recent releases
+While doing E-2352 (TruncateLog in go-cfgstore) the plan named go-dt v0.7.0, and I treated that and the other pinned versions as exact requirements, filing reconcile discrepancies and asking Mike to approve each dependency bump the build forced. Mike said this was pedantic: another session wrote those numbers, and the bigger picture is what matters. When a task touches a module's dependencies, update all of them to their most recent releases and get on with the work, rather than asking for permission version by version.
+- **Project**: go-cfgstore

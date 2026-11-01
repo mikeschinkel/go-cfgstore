@@ -88,3 +88,7 @@ In E-2209 the plan said to check each dependency for uncommitted work and commit
 ### [2026-10-31] A file hidden by .git/info/exclude is invisible to git status; check with ls before claiming it is absent
 On E-2207 I told Mike TODO.md did not exist because git status showed nothing. An exclude entry hid it, and removing the entry made it untracked and block the land. Next time: ls the main checkout before saying a file is absent, and treat an exclude line as hiding a file that may still be there.
 - **Project**: go-cfgstore
+
+### [2026-10-31] "You" in Mike's questions means Claude in any session, not this one
+While reconciling E-2351 in go-cfgstore, Mike asked whether Claude had removed dt.LogOnError without telling him. The session answered that it had not touched go-dt in this session and that Mike had renamed it, because git attributed the commit to Mike. Mike corrected: when he says "you" he means Claude in ANY session, not just the current one. A git author of Mike with no Co-Authored-By trailer does not establish that a person made the change; most commits in these repos come out of Claude sessions. So answer the question he asked: what changed, when, by which commit, and whether a Claude session plausibly did it, rather than disclaiming responsibility for the current session.
+- **Project**: go-cfgstore

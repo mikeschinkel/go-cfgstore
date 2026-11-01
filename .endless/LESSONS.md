@@ -104,3 +104,7 @@ While doing E-2352 (TruncateLog in go-cfgstore) the plan named go-dt v0.7.0, and
 ### [2026-10-31] An unpublished dependency is a blocker to name, not a limitation to report
 On E-2351 (go-cfgstore) the session reported that test/go.mod still reached go-testutil v0.3.0 through a replace because v0.3.0 was unpublished, and attributed publishing it to E-2209 as if that closed the matter. Mike: NO. Tell him which task lands and publishes it is a blocker, and he will land and publish it. When a dependency the task needs is unpublished, find the task that releases it, name it as a blocker (and record the blocked_by relation), so he can act, rather than leaving a replace in place and calling it someone else's scope.
 - **Project**: go-cfgstore
+
+### [2026-10-31] A replace that only resolves from main is a blocker to record, not a limitation to route around
+On E-2352 (go-cfgstore) test/go.mod reached go-testutil v0.3.0 through a replace that resolves only from the main checkout, because v0.3.0 is unpublished. I built the test module through a scratch -modfile, called it a known limitation in the handoff, and attributed dropping the replace to E-2209. Mike: NO, it should be a blocker. The task that releases go-testutil (E-2511) blocks this task; record it with endless task block so he can land and publish it. A workaround that lets the suite run does not discharge the blocker, and reporting it as someone else's scope hides the thing he needs to act on.
+- **Project**: go-cfgstore

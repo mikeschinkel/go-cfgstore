@@ -1,0 +1,1 @@
+Mike's edit, moved onto the task branch unchanged: writer_logger.go adds IO dt.StdIO to WriterLoggerArgs and passes it in cliutil.WriterArgs.

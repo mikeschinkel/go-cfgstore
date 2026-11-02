@@ -1,0 +1,1 @@
+Mike wrote this himself on 2026-11-02 in the go-cfgstore main checkout while planning gomion E-2540. It depends on go-cliutil's WriterArgs gaining IO, reached through go.work ../go-cliutil until tagged. Moved onto this task branch as is.

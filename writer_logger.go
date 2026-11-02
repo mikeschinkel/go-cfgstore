@@ -15,6 +15,7 @@ var ErrFailedWriterSetup = errors.New("failed writer setup")
 var ErrFailedLoggerSetup = errors.New("failed logger setup")
 
 type WriterLoggerArgs struct {
+	IO          dt.StdIO
 	Quiet       bool
 	Verbosity   cliutil.Verbosity
 	ConfigSlug  dt.PathSegment
@@ -28,6 +29,7 @@ func CreateWriterLogger(args *WriterLoggerArgs) (wr cliutil.WriterLogger, err er
 	var logDir dt.DirPath
 
 	writer := cliutil.NewWriter(&cliutil.WriterArgs{
+		IO:        args.IO,
 		Quiet:     args.Quiet,
 		Verbosity: args.Verbosity,
 	})

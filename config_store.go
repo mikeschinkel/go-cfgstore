@@ -8,7 +8,6 @@ import (
 	"runtime"
 
 	"github.com/mikeschinkel/go-dt"
-	"github.com/mikeschinkel/go-dt/dtx"
 )
 
 // DefaultConfigDirType is currently hardcoded for ~/.config but having this
@@ -345,19 +344,17 @@ func (cs *configStore) ConfigSlug() dt.PathSegment {
 	return cs.configSlug
 }
 
+// ensureConfig loads the config file into rc when the file exists and creates
+// the file from rc when it is missing. Whether the file exists is the only thing
+// that decides: an existing file is never written, even when it decodes to a
+// zero rc, because a file holding only keys rc does not declare (one written by
+// a newer binary, say) decodes to zero too, and rewriting it would erase them.
 func (cs *configStore) ensureConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
-	err = cs.loadConfigIfExists(rc, dirType, opts)
-	if err != nil {
-		// A real error occurred, bail out
-		goto end
-	}
-
-	if rc == nil || dtx.IsZero(rc) {
-		// Config not loaded, need to create config
+	if !cs.Exists() {
 		err = cs.createConfig(rc, dirType, opts)
 		goto end
 	}
-
+	err = cs.loadConfigIfExists(rc, dirType, opts)
 end:
 	return err
 }

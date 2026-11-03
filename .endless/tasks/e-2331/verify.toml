@@ -1,0 +1,46 @@
+# Verification suite for E-2331 — create a config only when its file is missing.
+# DO NOT EDIT unless you ARE E-2331. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2331"
+
+# E-2331's own tests first, fail-fast (P1, P2, P3): an existing file with only
+# unknown keys is left byte-for-byte unchanged, a missing file is created, and
+# an existing file with known keys loads and is left as it was.
+[[check]]
+name    = "P1-P3: TestEnsureConfig_*"
+runner  = "gotest"
+dir     = "test"
+command = "GOWORK=off go test -json -race -count=1 -run '^TestEnsureConfig_' ./..."
+
+# P1: ensureConfig no longer decides by whether the loaded struct is zero.
+[[check]]
+name   = "P1: ensureConfig has no dtx.IsZero check"
+sh     = "awk '/^func \\(cs \\*configStore\\) ensureConfig\\(/,/^}/' config_store.go | grep -c 'IsZero'"
+equals = "0"
+
+[[check]]
+name   = "P1-P2: ensureConfig decides by cs.Exists()"
+sh     = "awk '/^func \\(cs \\*configStore\\) ensureConfig\\(/,/^}/' config_store.go | grep -c 'cs.Exists()'"
+equals = "1"
+
+# P4: build, vet and tests pass with GOWORK=off in every module.
+[[check]]
+name = "P4: root module builds, vets and tests with GOWORK=off"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./... && GOWORK=off go test -race -count=1 ./..."
+
+[[check]]
+name = "P4: test module builds and vets with GOWORK=off"
+dir  = "test"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
+
+[[check]]
+name    = "P4: test module unit tests pass with GOWORK=off"
+runner  = "gotest"
+dir     = "test"
+command = "GOWORK=off go test -json -race -count=1 ./..."
+
+[[check]]
+name = "P4: examples/basic_usage builds and vets with GOWORK=off"
+dir  = "examples/basic_usage"
+sh   = "GOWORK=off go build -o /dev/null ./... && GOWORK=off go vet ./..."

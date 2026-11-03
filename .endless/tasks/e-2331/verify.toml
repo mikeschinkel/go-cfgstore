@@ -16,8 +16,7 @@ command = "GOWORK=off go test -json -race -count=1 -run '^TestEnsureConfig_' ./.
 # P1: ensureConfig no longer decides by whether the loaded struct is zero.
 [[check]]
 name   = "P1: ensureConfig has no dtx.IsZero check"
-sh     = "awk '/^func \\(cs \\*configStore\\) ensureConfig\\(/,/^}/' config_store.go | grep -c 'IsZero'"
-equals = "0"
+sh     = "! awk '/^func \\(cs \\*configStore\\) ensureConfig\\(/,/^}/' config_store.go | grep -q 'IsZero'"
 
 [[check]]
 name   = "P1-P2: ensureConfig decides by cs.Exists()"

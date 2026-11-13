@@ -24,3 +24,8 @@ verify = "Mike says so in the session"
 id = "P4"
 kind = "deliverable"
 statement = "createLogger's fallback Errorf passes args matching its format verbs, so go vet passes against go-cliutil v0.5.1"
+
+[[item]]
+id = "P5"
+kind = "deliverable"
+statement = "test/writer_logger_test.go proves an IO set on WriterLoggerArgs receives the writer's output and error output"

@@ -19,3 +19,8 @@ id = "P3"
 kind = "deliverable"
 statement = "Mike reviews and approves the code in the task worktree before the task leaves unverified; the session does not mark it done on its own"
 verify = "Mike says so in the session"
+
+[[item]]
+id = "P4"
+kind = "deliverable"
+statement = "createLogger's fallback Errorf passes args matching its format verbs, so go vet passes against go-cliutil v0.5.1"

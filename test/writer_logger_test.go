@@ -3,6 +3,7 @@ package test
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/mikeschinkel/go-cfgstore"
@@ -74,4 +75,20 @@ func TestCreateWriterLogger_TruncateLog(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, staleLogLine, string(content))
 	})
+}
+
+func TestCreateWriterLogger_IO(t *testing.T) {
+	var out, errOut strings.Builder
+	writerLoggerSetup(t)
+	wl, err := cfgstore.CreateWriterLogger(&cfgstore.WriterLoggerArgs{
+		IO:         dt.NewStdIO(&out, &errOut),
+		Verbosity:  cliutil.LowVerbosity,
+		ConfigSlug: truncateLogSlug,
+		LogFile:    truncateLogFile,
+	})
+	require.NoError(t, err)
+	wl.Printf("to the injected output\n")
+	wl.Errorf("to the injected error output\n")
+	require.Equal(t, "to the injected output\n", out.String())
+	require.Equal(t, "to the injected error output\n", errOut.String())
 }

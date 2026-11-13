@@ -68,7 +68,7 @@ func createLogger(logDir dt.DirPath, writer cliutil.Writer, args *WriterLoggerAr
 	if !canWrite {
 		tmpDir := dt.TempDir()
 		tmpFile, err = dt.CreateTemp(tmpDir, string(args.ConfigSlug)+"-*")
-		writer.Errorf("Cannot write to %s. Logging to %s-* instead\n", logDir, tmpDir, args.ConfigSlug)
+		writer.Errorf("Cannot write to %s. Logging to %s/%s-* instead\n", logDir, tmpDir, args.ConfigSlug)
 		if err != nil {
 			err = dt.NewErr(dt.ErrFailedtoCreateTempFile, err)
 			goto end

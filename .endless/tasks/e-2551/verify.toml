@@ -1,0 +1,28 @@
+# Verification suite for E-2551 — pass a StdIO through WriterLoggerArgs to the cliutil Writer.
+# DO NOT EDIT unless you ARE E-2551. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2551"
+
+# The project's native tests first, fail-fast, without go.work (P1, P2, P4).
+[[check]]
+name    = "test module unit tests, GOWORK=off"
+runner  = "gotest"
+dir     = "test"
+command = "GOWORK=off go test -json -race -count=1 ./..."
+
+# P1, P2: the root module builds and vets from published requires alone.
+[[check]]
+name = "P1/P2: go build and go vet pass with GOWORK=off"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
+
+# P2: go.mod requires go-cliutil v0.5.1 and go-dt v0.7.1.
+[[check]]
+name   = "P2: go.mod requires go-cliutil v0.5.1 and go-dt v0.7.1"
+sh     = "GOWORK=off go list -m -f '{{.Path}} {{.Version}}' github.com/mikeschinkel/go-cliutil github.com/mikeschinkel/go-dt"
+equals = "github.com/mikeschinkel/go-cliutil v0.5.1\ngithub.com/mikeschinkel/go-dt v0.7.1"
+
+# P2: go.sum matches go.mod.
+[[check]]
+name = "P2: go mod verify and tidy leave go.mod and go.sum unchanged"
+sh   = "GOWORK=off go mod verify && GOWORK=off go mod tidy -diff"

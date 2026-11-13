@@ -1,0 +1,716 @@
+{
+  "reportFormat": "CTRF",
+  "specVersion": "0.2.0",
+  "results": {
+    "tool": {
+      "name": "endless"
+    },
+    "summary": {
+      "tests": 64,
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "other": 0,
+      "start": 1794607872388,
+      "stop": 1794607874243
+    },
+    "tests": [
+      {
+        "name": "TestGetAppCacheDir_ReturnsUserCacheDirError",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestConfigStore_SaveLoadExists",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestConfigStore_LoadNonexistent",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestConfigStore_SaveInvalidJSON",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestConfigStore_ConfigDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestConfigStores_CLIAndProjectStores",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestConfigStore_LoadFromPreCreatedFixture",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestFuzzCorpus",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_UserHomeDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_UserConfigDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_ProjectDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_Getwd",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestTestDirsProviderArgs_GetTestRoot",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestTestDirsProviderArgs_WithoutTestRoot",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestTestDirsProviderArgs_TestRootFunc",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestTestDirsProviderArgs_RelConfigDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_EmptyUsername",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_InvalidUsername",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestNewTestDirsProvider_EmptyProjectDir",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge/LoadConfig",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge/LoadDefaultConfig",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge/LoadConfigStores",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_CLIAndProjectLayersMerge",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_EachMergeReceivesTheMergeOfEarlierLayers",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_InPlaceMergeMatchesCopyingMerge",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_MergeReturningAnotherTypeFails",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_MergeReturningNilFails/nil_RootConfig",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_MergeReturningNilFails/nil_pointer_of_the_config_type",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_MergeReturningNilFails",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_SingleLayerIsReturnedWithoutMerge/one_DirType",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_SingleLayerIsReturnedWithoutMerge/no_project_config_file",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestLoad_SingleLayerIsReturnedWithoutMerge",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestCreateWriterLogger_TruncateLog/no_log_file_yet",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestCreateWriterLogger_TruncateLog/existing_log_file_is_emptied",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestCreateWriterLogger_TruncateLog/existing_log_file_is_kept_without_TruncateLog",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestCreateWriterLogger_TruncateLog",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "TestCreateWriterLogger_IO",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#0",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#1",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#2",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#3",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#4",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#5",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#6",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#7",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#8",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#9",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#10",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#11",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#12",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore/seed#13",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewCLIConfigStore",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#0",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#1",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#2",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#3",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#4",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#5",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#6",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore/seed#7",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "FuzzNewProjectConfigStore",
+        "status": "passed",
+        "duration": 0,
+        "suite": [
+          "github.com/mikeschinkel/go-cfgstore/test"
+        ],
+        "labels": {
+          "check": "test module unit tests, GOWORK=off"
+        }
+      },
+      {
+        "name": "P1/P2: go build and go vet pass with GOWORK=off",
+        "status": "passed",
+        "duration": 231,
+        "labels": {
+          "check": "P1/P2: go build and go vet pass with GOWORK=off"
+        }
+      },
+      {
+        "name": "P2: go.mod requires go-cliutil v0.5.1 and go-dt v0.7.1",
+        "status": "passed",
+        "duration": 12,
+        "labels": {
+          "check": "P2: go.mod requires go-cliutil v0.5.1 and go-dt v0.7.1"
+        }
+      },
+      {
+        "name": "P2: go mod verify and tidy leave go.mod and go.sum unchanged",
+        "status": "passed",
+        "duration": 197,
+        "labels": {
+          "check": "P2: go mod verify and tidy leave go.mod and go.sum unchanged"
+        }
+      }
+    ]
+  }
+}

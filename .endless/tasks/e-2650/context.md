@@ -1,0 +1,1 @@
+go-cliutil now takes an app-supplied ConfigFunc and imports no config library (decision ED-1670 in go-cliutil). go-cfgstore already imports go-cliutil, so the adapter belongs here.

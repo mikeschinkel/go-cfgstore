@@ -2,7 +2,9 @@
 
 ### `RootConfig` and its constraint (`root_config.go`, `config_stores.go`)
 
-- `RootConfig` keeps `RootConfig()` and `Normalize(NormalizeArgs) error`, drops `Merge(RootConfig) RootConfig`, and gains `ApplyDefaults(DefaultsArgs) error`.
+- `RootConfig` keeps `RootConfig()` and `Normalize(NormalizeArgs) error`, drops `Merge(RootConfig) RootConfig`, and gains `ApplyDefaults(DefaultsArgs) error` and `Validate(ValidateArgs) error`.
+- `ValidateArgs` carries the file's `DirType`, `SourceFile` and `Options`.
+- `FieldValidator` is an interface with `Validate() error`, for field types that check their own value.
 - `RootConfigPtr[RC]` adds `Merge(MergeArgs[*RC]) error`, so `Merge` is required and typed. `CLIRootConfigPtr[RC]` embeds `RootConfigPtr[RC]` plus `cliutil.Config`.
 - `DefaultsArgs` carries `Options` and the `DirTypes` being loaded.
 - `MergeArgs[PRC]` carries the layer's `DirType` and `SourceFile`, and has:
@@ -11,7 +13,12 @@
 
 ### Loading (`LoadConfigStores`, `mergeRootConfigs`, `mergedRootConfig`, `loadConfigIfExists`)
 
-`LoadConfigStores` creates one value, calls `ApplyDefaults` on it, then for each DirType in order: ensures the CLI file exists (creating it as below), skips a project layer whose file does not exist, calls `Merge` with that layer's `MergeArgs`, then calls `Normalize` with that layer's `NormalizeArgs`. It stops at the first layer whose `Merge` or `Normalize` fails, wrapping the error with that layer's file path. `mergeRootConfigs` and `mergedRootConfig` go away, along with the `dtx.IsZero` test for an absent project layer; with no layer to load it returns `ErrNotValidConfigDirsAvailable` as today.
+`LoadConfigStores` loads in two passes.
+
+1. **Check pass.** For each DirType in order, it ensures the CLI file exists (creating it as below) and skips a project layer whose file does not exist. It decodes each remaining file alone into a new value, walks that value with reflection (nested structs, slice elements and map values) calling `Validate` on every field that implements `FieldValidator`, then calls the value's `RootConfig.Validate`. It collects every error from every file, each carrying the file path and, for a field, its dotted JSON path, and if there are any it fails the load with all of them joined.
+2. **Layered pass.** It creates one value, calls `ApplyDefaults` on it, then for each layer calls `Merge` with that layer's `MergeArgs` and `Normalize` with that layer's `NormalizeArgs`. It stops at the first layer whose `Merge` or `Normalize` fails, wrapping the error with that layer's file path.
+
+`mergeRootConfigs` and `mergedRootConfig` go away, along with the `dtx.IsZero` test for an absent project layer; with no layer to load it returns `ErrNotValidConfigDirsAvailable` as today. `MergeArgs.Layer` returns the value the check pass decoded.
 
 ### Creating a config file (`createConfig`, `initConfig`, `InitProjectConfig`)
 
@@ -27,7 +34,8 @@ Each implements `UnmarshalJSONFrom` and marshals as its underlying type.
 
 ### Doc comments
 
-- `Normalize`: runs after each layer on the value built from every layer so far; must be idempotent; must not set defaults.
+- `Normalize`: runs after each layer on the value built from every layer so far; must be idempotent; must not set defaults; validation belongs in `Validate` or a `FieldValidator`.
+- `Validate` and `FieldValidator`: run on each file decoded alone; a field type should accept any raw value when decoded and report problems from `Validate`, because a decode error stops decoding of that file.
 - `ApplyDefaults`: runs on an empty value before any layer decodes; set defaults here.
 - `Merge`: the common body is `return args.Decode(c)`, and `Layer` is for rules the decoder cannot express.
 - The failed-load wrap in `LoadConfigStores` gets a comment naming E-2658.

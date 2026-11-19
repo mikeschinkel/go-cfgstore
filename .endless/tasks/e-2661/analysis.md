@@ -15,7 +15,7 @@ Defaults applied to the fresh value before the first layer decodes survive every
 
 ## Decisions (Mike, in the /needs-plan exchange)
 
-- Q1 = B: `ApplyDefaults(DefaultsArgs) error` is a required `RootConfig` method, so a developer sees where defaults go. go-cfgstore is pre-v1.0 (latest tag v0.4.0), so it can become optional later if it proves burdensome.
+- Q1 = B: `ApplyDefaults(DefaultsArgs) error` is a required `RootConfig` method, so a developer sees where defaults go. Making it optional later, if it proves burdensome, would not break implementers.
 - Q2 = ii: defaults are written into a CLI config file go-cfgstore creates. E-2663 covers telling users when a written default goes stale.
 - Q3 = a (layered decode) over `Opt[T]`: `Opt[T]` needs `.Value()` on every read, `OptOf` in every literal, and an untyped `cfgstore:"append"` struct tag for per-field merge rules; Mike objected to the untyped tag. Layered decode keeps plain fields, and per-field overrides are typed (`AppendSlice[T]`, `ReplaceMap[K,V]`).
 - `Merge` stays a required method (Mike: a developer needs a method to implement as the place to start writing code). Its common-case body is one line, `return args.Decode(c)`, and it takes `MergeArgs[*RC]`, so there is no type assertion.

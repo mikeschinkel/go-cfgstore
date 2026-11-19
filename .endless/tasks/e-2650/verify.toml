@@ -40,13 +40,13 @@ contains = "region=ap format=csv format_source=command line"
 # P5: the adapter uses no tags, reflection or name lookup.
 [[check]]
 name   = "P5: cliutil_config.go has no reflect, struct tags or FlagValue"
-sh     = "grep -nE 'reflect|`|FlagValue' cliutil_config.go"
+sh     = "! grep -nE 'reflect|`|FlagValue' cliutil_config.go"
 equals = ""
 
 # P8: basic_usage is renamed basic, and nothing refers to the old name.
 [[check]]
 name   = "P8: examples/basic exists and basic_usage is gone"
-sh     = "test -f examples/basic/main.go && test ! -e examples/basic_usage && git grep -n basic_usage -- ':!.endless'"
+sh     = "test -f examples/basic/main.go && test ! -e examples/basic_usage && ! git grep -n basic_usage -- ':!.endless'"
 equals = ""
 
 # P11: README documents the wiring and ApplyConfig.
@@ -64,4 +64,4 @@ equals = "github.com/mikeschinkel/go-cliutil v0.6.0"
 # P13: every module builds, vets and lints clean with golangci-lint v2.15.0.
 [[check]]
 name = "P13: build, vet and golangci-lint v2.15.0 on every module"
-sh   = 'set -e; for m in . test examples/basic examples/comprehensive examples/cliutil; do (cd $m && GOWORK=off go build -o "$(mktemp -d)" ./... && GOWORK=off go vet ./... && GOWORK=off go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0 run ./... --timeout=5m); done'
+sh   = 'set -e; L=github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0; for m in . test examples/basic examples/comprehensive examples/cliutil; do case $m in examples/*) out=-o=/dev/null;; *) out=;; esac; (cd $m && GOWORK=off go build $out ./... && GOWORK=off go vet ./... && GOWORK=off go run $L run ./... --timeout=5m); done'

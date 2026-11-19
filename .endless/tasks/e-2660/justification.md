@@ -1,0 +1,1 @@
+Whether robust JSON repair is feasible and worth its cost is unknown, and Mike holds it as a maybe until the recovery design settles.

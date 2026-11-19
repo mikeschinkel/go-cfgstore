@@ -84,3 +84,8 @@ statement = "Does not change go-cliutil, the existing Load functions, or CreateW
 id = "P16"
 kind = "exclusion"
 statement = "Does not add a flag for choosing the config file"
+
+[[item]]
+id = "P17"
+kind = "deliverable"
+statement = "CI builds and tests all three examples, and .gitignore ignores their built binaries"

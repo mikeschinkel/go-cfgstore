@@ -124,3 +124,7 @@ In go-cfgstore E-2650, my handoff raised two things: the Normalize-default footg
 ### [2026-11-19] Don't list 'gains nothing over the alternative' as a con
 In /needs-plan for E-2661 (go-cfgstore, how a later config layer can set false/0), I marked Opt[T] down with the con 'JSON v1 could do the same, so it gains nothing from v2'. Mike asked why it wasn't recommended. That con is not a cost of choosing the option; it only says another tool could also do it. A con must name what choosing the option costs the user or codebase. Recheck each con against that before recommending against an option.
 - **Project**: go-cfgstore
+
+### [2026-11-19] Keep a required method as the dev's starting point
+In E-2661 planning (go-cfgstore config merge), I pitched layered decode as letting apps drop Merge entirely ('boilerplate can go to zero'). Mike objected: without a method to implement there is no place for a developer to start writing code; a required interface method is how a reader discovers where custom logic goes. He wants code a developer could read and extend by hand, even though agents write most of it now. For go-cfgstore's API, prefer a required method whose common-case body is one line over removing the method.
+- **Project**: go-cfgstore

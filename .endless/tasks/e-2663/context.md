@@ -1,0 +1,1 @@
+go-cfgstore writes defaults into a config file it creates (decided in E-2661), so a user who never edits a setting keeps the default from the day the file was created. When an app later changes that default, nothing tells the user. Mike asked for a way to notify them and offer the new value, likely needing versioned, Goose-style steps like those Endless uses for its database.

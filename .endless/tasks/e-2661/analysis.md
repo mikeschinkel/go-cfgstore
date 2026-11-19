@@ -26,7 +26,7 @@ Defaults applied to the fresh value before the first layer decodes survive every
 
 With layered decode, the `Normalize` run after each layer sees every layer decoded so far. This is not a cost for Endless or Gomion:
 
-- Endless's `Normalize` validates opt-in values and names `SourceFile`. Earlier layers' values were validated after their own layer, and the load stops at the first failure, so a later layer's error still names the file that introduced the bad value. Checks that compare values across layers, impossible today, become possible.
+- Endless's `Normalize` validates opt-in values and names `SourceFile`. Earlier layers' values were validated after their own layer, and validation moves out of `Normalize` into the check pass (see below), which sees each file alone.
 - Gomion's `Normalize` stamps `Schema` and `Version`, which is idempotent.
 
 It would only matter for a `Normalize` that is not idempotent (appending, or rewriting a value it already rewrote), so the doc comment requires idempotence.
@@ -34,3 +34,7 @@ It would only matter for a `Normalize` that is not idempotent (appending, or rew
 ## Project config init
 
 `InitProjectConfig` does not write defaults into the new project file. A project file holding every default would override each user's CLI-layer settings, which is the E-2661 bug again in a different place. The config it returns has defaults applied in memory, after the save.
+
+## Reporting every error at once (Q7 = D′)
+
+`encoding/json/v2` stops decoding a file at its first invalid field (verified: a field type whose `UnmarshalJSONFrom` rejected a value hid a second invalid field and a type error in the same file). Validating during decode therefore reports one error per file. Validating in `Normalize` during the layered pass would recheck earlier layers' values and blame later files. So validation runs in a check pass over each file decoded alone: go-cfgstore walks the value and calls `Validate` on each field type implementing `FieldValidator`, then calls the app's `RootConfig.Validate` for cross-field checks, and joins every error from every file. Endless already does this by hand (`OptInText` holds the raw string, `walkFields` walks the struct, `validateOptIns` joins the errors); under this design `OptInText` gets a `Validate` method and the walker moves into go-cfgstore. Rejected: stopping at the first failing layer (whack-a-mole across files); running `Normalize` on each file alone as well as layered (`Normalize` would see two kinds of value); an app-written `Validate` only (each app writes its own walk).

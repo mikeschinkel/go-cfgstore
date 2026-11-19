@@ -128,3 +128,7 @@ In /needs-plan for E-2661 (go-cfgstore, how a later config layer can set false/0
 ### [2026-11-19] Keep a required method as the dev's starting point
 In E-2661 planning (go-cfgstore config merge), I pitched layered decode as letting apps drop Merge entirely ('boilerplate can go to zero'). Mike objected: without a method to implement there is no place for a developer to start writing code; a required interface method is how a reader discovers where custom logic goes. He wants code a developer could read and extend by hand, even though agents write most of it now. For go-cfgstore's API, prefer a required method whose common-case body is one line over removing the method.
 - **Project**: go-cfgstore
+
+### [2026-11-19] Dropping a required method doesn't break implementers
+In E-2661 planning I said go-cfgstore being pre-v1.0 (v0.4.0) is what allows making the required ApplyDefaults method optional later. Mike pointed out that making a required interface method optional is backward compatible: existing implementers still satisfy the interface. Don't cite the version number as what permits that change; it's only needed for changes that break callers or implementers.
+- **Project**: go-cfgstore

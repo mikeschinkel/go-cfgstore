@@ -55,7 +55,7 @@ jobs:
 
     strategy:
       matrix:
-        example: [basic_usage]
+        example: [basic, comprehensive, cliutil]
 
     steps:
       - name: Checkout code
@@ -76,13 +76,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-examples-
 
-      - name: Build example - ${{ matrix.example }}
+      - name: Build and test example - ${{ matrix.example }}
         working-directory: examples/${{ matrix.example }}
         run: |
           go mod init example || true
           go mod edit -replace github.com/mikeschinkel/go-cfgstore=../..
           go mod tidy
           go build -v .
+          go test -v ./...
 
   # Lint and static analysis
   lint:

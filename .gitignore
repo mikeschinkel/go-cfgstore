@@ -8,7 +8,9 @@
 *.so
 *.dylib
 /bin/
-/examples/basic_usage/basic_usage
+/examples/basic/basic
+/examples/comprehensive/comprehensive
+/examples/cliutil/cliutil
 
 # Test binary, built with `go test -c`
 *.test

@@ -22,6 +22,7 @@ If you find value in this project and want to use it, please start a discussion 
 - **Hierarchical Configuration**: Load and merge configuration from multiple locations with precedence rules
 - **Flexible Directory Management**: Create subdirectories, override paths, and switch between directory types
 - **Type-Safe**: Uses domain types from `go-dt` for compile-time path safety (see [Type-Safe Path Handling](#type-safe-path-handling-with-go-dt))
+- **go-cliutil Adapter**: `CLIConfigFunc` wires go-cfgstore config into a [go-cliutil](https://github.com/mikeschinkel/go-cliutil) app in one line
 - **Test-Friendly**: Includes `cstest` package with utilities for testing configuration code
 - **Structured Errors**: Uses the `doterr` pattern for rich error context and metadata
 
@@ -1019,6 +1020,81 @@ func (w *MyConfigWrapper) Merge(other cfgstore.RootConfig) cfgstore.RootConfig {
 - JSON operations work on the wrapper type, not the embedded struct
 - Without these methods, JSON would try to marshal the wrapper's fields (which includes an embedded struct)
 - These methods ensure JSON operations target the actual config struct directly
+
+## Using go-cfgstore with go-cliutil
+
+[go-cliutil](https://github.com/mikeschinkel/go-cliutil) imports no config
+library: an app hands its `CmdRunner` a `cliutil.ConfigFunc`.
+`cfgstore.CLIConfigFunc` returns one that loads the app's root config with
+`LoadConfig`, so wiring go-cfgstore into a go-cliutil app is one line:
+
+```go
+runner := cliutil.NewCmdRunner(cliutil.CmdRunnerArgs{
+    AppInfo: appinfo.New(appinfo.Args{
+        Name:       "myapp",
+        ConfigSlug: "myapp",       // ~/.config/myapp and ./.myapp
+        ConfigFile: "config.json",
+    }),
+    Config:  cfgstore.CLIConfigFunc[RootConfig](cfgstore.CLIConfigArgs{}),
+    Options: NewOptions,
+})
+```
+
+- The config slug and file come from the run's `AppInfo`, so the app passes no paths.
+- `CLIConfigArgs` has optional `DirTypes` and `DirsProvider`, defaulting as
+  `LoadConfig` does: the CLI layer, then the project layer, which wins. Pass a
+  `DirsProvider` in tests to keep config under a temp directory.
+- `*RootConfig` must implement both `cfgstore.RootConfig` and `cliutil.Config`
+  (a `Config()` marker method).
+- The app must call `cfgstore.SetLogger` (or `CreateWriterLogger`) before the
+  first run, as for any go-cfgstore load.
+
+The loaded `*RootConfig` is the run's `cliutil.Config`. Options and commands
+copy it into typed fields with `ApplyConfig`, reading the root config's typed
+methods, so the compiler checks every config-to-flag mapping. go-cliutil calls
+`ApplyConfig` after flag defaults and before command-line values, so a flag the
+user types beats config:
+
+```go
+type RootConfig struct {
+    RegionName string `json:"region,omitempty"`
+}
+
+func (*RootConfig) Config() {}
+func (c *RootConfig) Region() string { return c.RegionName }
+// ...plus RootConfig(), Normalize() and Merge() for cfgstore.RootConfig.
+
+type Options struct {
+    *cliutil.GlobalOptions
+    Region string
+}
+
+func (o *Options) FlagDefs() []cliutil.FlagDef {
+    return []cliutil.FlagDef{
+        {Name: "region", DefaultString: "us", String: &o.Region},
+    }
+}
+
+func (o *Options) ApplyConfig(cfg cliutil.Config) error {
+    c := cliutil.ConfigAs[*RootConfig](cfg)
+    if c.Region() != "" {
+        o.Region = c.Region()
+    }
+    return nil
+}
+```
+
+A command implements `ApplyConfig` the same way for its own flags.
+[examples/cliutil](examples/cliutil) is a complete app with a `cliutiltest`
+table showing config applied and a typed flag winning.
+
+## Examples
+
+- [examples/basic](examples/basic): save and load one config file.
+- [examples/comprehensive](examples/comprehensive): every go-cfgstore feature,
+  in a temporary directory.
+- [examples/cliutil](examples/cliutil): a go-cliutil app wired with
+  `CLIConfigFunc` and `ApplyConfig`.
 
 ## Testing Support
 

@@ -1,12 +1,14 @@
-module basic_usage
+module comprehensive
 
 go 1.27.0
 
-require github.com/mikeschinkel/go-cfgstore v0.4.0
+require (
+	github.com/mikeschinkel/go-cfgstore v0.4.0
+	github.com/mikeschinkel/go-cliutil v0.6.0
+	github.com/mikeschinkel/go-dt v0.7.1
+)
 
 require (
-	github.com/mikeschinkel/go-cliutil v0.5.1 // indirect
-	github.com/mikeschinkel/go-dt v0.7.1 // indirect
 	github.com/mikeschinkel/go-dt/appinfo v0.4.0 // indirect
 	github.com/mikeschinkel/go-dt/dtx v0.3.0 // indirect
 	github.com/mikeschinkel/go-logutil v0.2.1 // indirect

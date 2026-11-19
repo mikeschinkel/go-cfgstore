@@ -88,4 +88,4 @@ statement = "Does not add a flag for choosing the config file"
 [[item]]
 id = "P17"
 kind = "deliverable"
-statement = "CI builds and tests all three examples, and .gitignore ignores their built binaries"
+statement = "CI builds and tests all three examples; locally they build to bin/ through just examples, with no per-example .gitignore entries"

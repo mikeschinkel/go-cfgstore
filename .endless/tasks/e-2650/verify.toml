@@ -64,4 +64,4 @@ equals = "github.com/mikeschinkel/go-cliutil v0.6.0"
 # P13: every module builds, vets and lints clean with golangci-lint v2.15.0.
 [[check]]
 name = "P13: build, vet and golangci-lint v2.15.0 on every module"
-sh   = "set -e; for m in . test examples/basic examples/comprehensive examples/cliutil; do (cd $m && GOWORK=off go build ./... && GOWORK=off go vet ./... && GOWORK=off go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0 run ./... --timeout=5m); done"
+sh   = "set -e; for m in . test examples/basic examples/comprehensive examples/cliutil; do (cd $m && GOWORK=off go build -o "$(mktemp -d)" ./... && GOWORK=off go vet ./... && GOWORK=off go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0 run ./... --timeout=5m); done"

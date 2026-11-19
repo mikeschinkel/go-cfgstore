@@ -116,3 +116,7 @@ On go-cfgstore E-2551, plan item P3 said Mike reviews the code before the task l
 ### [2026-11-19] Fix library footguns, don't work around them in examples
 While writing examples/comprehensive for go-cfgstore E-2650, I found that defaults set in RootConfig.Normalize on a later layer override an earlier layer's real values after Merge, and I just rewrote the example to avoid defaults and noted it in a comment. Mike said a footgun like that should be addressed, not papered over. When an example or test exposes a library behavior that would trip real users, surface it as a bug to fix (ask to file it), rather than only reshaping the example around it.
 - **Project**: go-cfgstore
+
+### [2026-11-19] Ask which item a terse reply answers
+In go-cfgstore E-2650, my handoff raised two things: the Normalize-default footgun (as a note) and the ProjectConfigStoreExists bug (with the question 'Should I file it?'). Mike replied about the footgun, then 'File bugfix.' I filed the footgun; he meant the ProjectConfigStoreExists bug, which was the item I had actually asked about. When a short instruction follows a message that raised several items, map it to the item whose question it answers, and ask if it could still mean more than one.
+- **Project**: go-cfgstore

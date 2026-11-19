@@ -112,3 +112,7 @@ On E-2352 (go-cfgstore) test/go.mod reached go-testutil v0.3.0 through a replace
 ### [2026-11-13] A passing user verify is the review approval; don't ask for it again
 On go-cfgstore E-2551, plan item P3 said Mike reviews the code before the task leaves unverified. My handoff told him to review P3 separately, on top of the verify command, which confused him. His own endless task verify run is that review: a passing run moves the task out of unverified. When a plan item gates on Mike's review before unverified ends, hand him only the verify command and don't list the review as a separate step.
 - **Project**: go-cfgstore
+
+### [2026-11-19] Fix library footguns, don't work around them in examples
+While writing examples/comprehensive for go-cfgstore E-2650, I found that defaults set in RootConfig.Normalize on a later layer override an earlier layer's real values after Merge, and I just rewrote the example to avoid defaults and noted it in a comment. Mike said a footgun like that should be addressed, not papered over. When an example or test exposes a library behavior that would trip real users, surface it as a bug to fix (ask to file it), rather than only reshaping the example around it.
+- **Project**: go-cfgstore

@@ -120,3 +120,7 @@ While writing examples/comprehensive for go-cfgstore E-2650, I found that defaul
 ### [2026-11-19] Ask which item a terse reply answers
 In go-cfgstore E-2650, my handoff raised two things: the Normalize-default footgun (as a note) and the ProjectConfigStoreExists bug (with the question 'Should I file it?'). Mike replied about the footgun, then 'File bugfix.' I filed the footgun; he meant the ProjectConfigStoreExists bug, which was the item I had actually asked about. When a short instruction follows a message that raised several items, map it to the item whose question it answers, and ask if it could still mean more than one.
 - **Project**: go-cfgstore
+
+### [2026-11-19] Don't list 'gains nothing over the alternative' as a con
+In /needs-plan for E-2661 (go-cfgstore, how a later config layer can set false/0), I marked Opt[T] down with the con 'JSON v1 could do the same, so it gains nothing from v2'. Mike asked why it wasn't recommended. That con is not a cost of choosing the option; it only says another tool could also do it. A con must name what choosing the option costs the user or codebase. Recheck each con against that before recommending against an option.
+- **Project**: go-cfgstore

@@ -1096,6 +1096,8 @@ table showing config applied and a typed flag winning.
 - [examples/cliutil](examples/cliutil): a go-cliutil app wired with
   `CLIConfigFunc` and `ApplyConfig`.
 
+Build them all to `bin/` with `just examples`.
+
 ## Testing Support
 
 The `cstest` package provides utilities for testing:

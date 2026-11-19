@@ -1,0 +1,1 @@
+Corrupt-config recovery spans parse failures, validation failures, partial repair and file renaming; its requirements need discussion with Mike before any plan.

@@ -1,0 +1,1 @@
+Raised by Mike on 2026-11-19 while discussing corrupt config recovery for go-cfgstore and go-cliutil. If the go-cfgstore recovery brainstorm wants to repair parts of a damaged file rather than replace it, a streaming JSON parser might detect and fix damage such as a missing trailing brace. Mike marked this a maybe: worth doing only if recovery wants to get that robust.

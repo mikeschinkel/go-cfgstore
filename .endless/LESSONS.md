@@ -132,3 +132,7 @@ In E-2661 planning (go-cfgstore config merge), I pitched layered decode as letti
 ### [2026-11-19] Dropping a required method doesn't break implementers
 In E-2661 planning I said go-cfgstore being pre-v1.0 (v0.4.0) is what allows making the required ApplyDefaults method optional later. Mike pointed out that making a required interface method optional is backward compatible: existing implementers still satisfy the interface. Don't cite the version number as what permits that change; it's only needed for changes that break callers or implementers.
 - **Project**: go-cfgstore
+
+### [2026-11-19] Write decisions in plain words a stranger can read
+Filing ED-1677 (go-cfgstore config layering, from E-2661 planning), I wrote the title and description in planning-session jargon: 'per-layer decode', 'field-by-field merge', 'presence-tracking wrapper types', 'sequential decode'. Mike asked for a rewrite without jargon or with each term defined, because a future reader of a decision has none of the conversation's context. Before filing a decision, reread it as a stranger: replace coined terms with what actually happens, or define them inline.
+- **Project**: go-cfgstore

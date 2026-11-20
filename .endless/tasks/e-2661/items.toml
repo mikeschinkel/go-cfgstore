@@ -169,3 +169,8 @@ statement = "Does not notify users about outdated defaults written to their conf
 id = "P56"
 kind = "exclusion"
 statement = "Does not detect, repair or quarantine a corrupt config file"
+
+[[item]]
+id = "P57"
+kind = "deliverable"
+statement = "InitProjectConfig omits zero-valued fields from the project file, since encoding/json/v2's omitempty keeps false and 0 and a written zero would override the CLI layer"

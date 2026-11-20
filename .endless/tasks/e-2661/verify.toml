@@ -1,0 +1,61 @@
+# Verification suite for E-2661 — layered decode so Normalize/ApplyDefaults
+# defaults in a later layer no longer hide earlier layers' values.
+# DO NOT EDIT unless you ARE E-2661. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2661"
+
+# The test module's tests first, fail-fast (P27–P29, P32–P45).
+[[check]]
+name   = "test module unit tests"
+runner = "gotest"
+dir    = "test"
+paths  = ["./..."]
+
+# P49: the examples' own tests.
+[[check]]
+name   = "P49: examples/comprehensive tests"
+runner = "gotest"
+dir    = "examples/comprehensive"
+paths  = ["./..."]
+
+[[check]]
+name   = "P49: examples/cliutil tests"
+runner = "gotest"
+dir    = "examples/cliutil"
+paths  = ["./..."]
+
+# P50: the CLI layer's theme survives a project layer that omits it, and the
+# default applies where no layer sets theme.
+[[check]]
+name     = "P50: go run examples/comprehensive keeps the CLI theme"
+sh       = "cd examples/comprehensive && GOWORK=off go run . 2>&1"
+contains = "merged: theme=dark editor=helix source=project"
+
+[[check]]
+name     = "P50: go run examples/comprehensive applies the theme default"
+sh       = "cd examples/comprehensive && GOWORK=off go run . 2>&1"
+contains = "project only: theme=light editor=helix"
+
+# P30, P31: the RootConfig and RootConfigPtr shapes.
+[[check]]
+name   = "P30/P31: RootConfig requires ApplyDefaults and Validate, RootConfigPtr requires typed Merge"
+sh     = "grep -cE '^\\s+(ApplyDefaults\\(DefaultsArgs\\) error|Validate\\(ValidateArgs\\) error|Merge\\(MergeArgs\\[\\*RC\\]\\) error)$' root_config.go; ! grep -n 'Merge(RootConfig) RootConfig' root_config.go"
+equals = "3"
+
+# P47: the failed-load wrap names E-2658.
+[[check]]
+name   = "P47: config_stores.go names E-2658 at the failed-load wrap"
+sh     = "grep -B6 'ErrFailedToEnsureConfig,' config_stores.go | grep -c E-2658"
+equals = "1"
+
+# P51: README documents layered loading, ApplyDefaults, Merge and the field types.
+[[check]]
+name   = "P51: README covers layered loading and the field types"
+sh     = "grep -c -e '^#### Layered loading' -e '^#### ApplyDefaults()' -e '^#### Merge()' -e 'cfgstore.AppendSlice\\[T\\]' -e 'cfgstore.ReplaceMap\\[K, V\\]' README.md"
+equals = "5"
+
+# P52: every module builds, vets and lints clean with golangci-lint v2.15.0.
+[[check]]
+name = "P52: build, vet and golangci-lint v2.15.0 on every module"
+sh   = 'set -e; L=github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0; for m in . test examples/basic examples/comprehensive examples/cliutil; do case $m in examples/*) out=-o=/dev/null;; *) out=;; esac; (cd $m && GOWORK=off go build $out ./... && GOWORK=off go vet ./... && GOWORK=off go run $L run ./... --timeout=5m); done'

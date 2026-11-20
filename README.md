@@ -140,7 +140,7 @@ if err != nil {
 fmt.Printf("Username: %s, Theme: %s\n", config.Username, config.Theme)
 ```
 
-See [API Tiers](#api-tiers) for alternative approaches, [Understanding Normalize()](#understanding-normalize) for the config lifecycle, and [Common Patterns](#common-patterns) for advanced merging patterns.
+See [API Tiers](#api-tiers) for alternative approaches, [Layered loading](#layered-loading) for the config lifecycle, and [Common Patterns](#common-patterns) for advanced merging patterns.
 
 ## API Tiers
 
@@ -477,13 +477,26 @@ config, err := cfgstore.LoadDefaultConfig[MyConfig, *MyConfig](cfgstore.LoadConf
 
 ### RootConfig Interface
 
-Interface for application-specific root configuration that requires normalization. See [RootConfig Interface Implementation Pattern](#rootconfig-interface-implementation-pattern) for detailed implementation guidance and [Understanding Normalize()](#understanding-normalize) for the config lifecycle.
+Interface for an application's root configuration. See [RootConfig Interface Implementation Pattern](#rootconfig-interface-implementation-pattern) for detailed implementation guidance and [Layered loading](#layered-loading) for the config lifecycle.
 
 ```go
 type RootConfig interface {
     RootConfig()
+    ApplyDefaults(DefaultsArgs) error
     Normalize(NormalizeArgs) error
-    Merge(RootConfig) RootConfig
+    Validate(ValidateArgs) error
+}
+
+// RootConfigPtr adds Merge, typed to the app's own config.
+type RootConfigPtr[RC any] interface {
+    RootConfig
+    Merge(MergeArgs[*RC]) error
+    *RC
+}
+
+// FieldValidator is a field type that checks its own value.
+type FieldValidator interface {
+    Validate() error
 }
 ```
 
@@ -621,13 +634,16 @@ type MyRootConfig struct {
     Theme    string `json:"theme"`
 }
 
-func (c *MyRootConfig) Normalize(args cfgstore.NormalizeArgs) error {
-    if c.Theme == "" {
-        c.Theme = "light" // default
-    }
+func (c *MyRootConfig) RootConfig() {}
+func (c *MyRootConfig) ApplyDefaults(cfgstore.DefaultsArgs) error {
+    c.Theme = "light" // default
     return nil
 }
-func (c *MyRootConfig) RootConfig() {}
+func (c *MyRootConfig) Normalize(cfgstore.NormalizeArgs) error { return nil }
+func (c *MyRootConfig) Validate(cfgstore.ValidateArgs) error   { return nil }
+func (c *MyRootConfig) Merge(args cfgstore.MergeArgs[*MyRootConfig]) error {
+    return args.Decode(c)
+}
 
 // Create stores
 stores := cfgstore.NewConfigStores(cfgstore.ConfigStoresArgs{
@@ -724,14 +740,19 @@ type MyProjectConfig struct {
     Name    string `json:"name"`
 }
 
+func (c *MyProjectConfig) RootConfig() {}
+
+// Normalize stamps the schema version, so the new project file records it.
 func (c *MyProjectConfig) Normalize(args cfgstore.NormalizeArgs) error {
-    if c.Version == "" {
-        c.Version = "1.0"
-    }
+    c.Version = "1.0"
     return nil
 }
 
-func (c *MyProjectConfig) RootConfig() {}
+func (c *MyProjectConfig) ApplyDefaults(cfgstore.DefaultsArgs) error { return nil }
+func (c *MyProjectConfig) Validate(cfgstore.ValidateArgs) error      { return nil }
+func (c *MyProjectConfig) Merge(args cfgstore.MergeArgs[*MyProjectConfig]) error {
+    return args.Decode(c)
+}
 
 func initProject() error {
     config, err := cfgstore.InitProjectConfig[MyProjectConfig, *MyProjectConfig](
@@ -851,132 +872,131 @@ config, err := LoadAppConfig[MyConfig, *MyConfig](
 
 ### RootConfig Interface Implementation Pattern
 
-Your configuration struct must implement the `RootConfig` interface. The key method is `Normalize()`, which ensures loaded configurations always have complete, valid values.
+Your configuration struct must implement the `RootConfig` interface, and its pointer must also have a `Merge` method (see `RootConfigPtr`). Each method has one job:
 
-#### Understanding Normalize()
+| Method | Runs | Job |
+|--------|------|-----|
+| `ApplyDefaults` | once, on an empty value, before any layer | Set defaults |
+| `Merge` | once per layer, in order | Combine the layer's file into the value |
+| `Normalize` | after each layer's `Merge` | Clean values; idempotent |
+| `Validate` | once per file, on that file decoded alone | Check values across fields |
 
-The `Normalize()` method is called **after loading** a config file but **before** returning it to your application. This ensures:
+#### Layered loading
 
-1. **Default Values**: Missing fields get sensible defaults
-2. **Validation**: Invalid configurations are rejected early
-3. **Computed Fields**: Derived values can be calculated
-4. **Path Resolution**: Relative paths can be made absolute
+`LoadConfigStores()` (and so `LoadConfig()` and the convenience functions) loads in two passes.
 
-**The Pattern:**
+1. **Check pass.** For each DirType in order, it reads the layer's file — creating a missing CLI or app file, skipping a missing project file — and decodes it alone into a new value. It calls `Validate()` on every field implementing `FieldValidator`, in nested structs, slice elements and map values too, then calls the config's own `Validate()`. If any file has any problem, loading fails with every error from every file at once, each naming its file and, for a field, its dotted JSON path (`items.1.color`). A file that fails to decode is reported alongside the other files' errors.
+2. **Layered pass.** It creates one value, calls `ApplyDefaults()` on it, then for each layer calls `Merge()` and `Normalize()`. It stops at the first layer whose `Merge()` or `Normalize()` fails, naming that layer's file.
+
+Because every layer is decoded over the same value, a key a file omits keeps the value earlier layers (or `ApplyDefaults`) gave it, and a key a file sets wins, even when it sets `false`, `0` or `""`. A default can therefore never hide a value an earlier layer set.
 
 ```go
 type MyConfig struct {
-    // Your config fields
-    Username string `json:"username"`
-    Theme    string `json:"theme"`
+    Username string `json:"username,omitempty"`
+    Theme    string `json:"theme,omitempty"`
+    Editor   string `json:"editor,omitempty"`
 }
 
-// Normalize applies defaults and validates configuration
-func (c *MyConfig) Normalize(args cfgstore.NormalizeArgs) error {
-    // 1. Apply defaults for missing values
-    if c.Theme == "" {
-        c.Theme = "light"  // Default theme
-    }
+func (c *MyConfig) RootConfig() {}
 
-    // 2. Validate required fields
-    if c.Username == "" {
-        return cfgstore.NewErr(ErrInvalidConfig, "username", "required")
-    }
-
-    // 3. (Optional) Parse/transform values if needed
-    // For example, you might call Parse functions from go-dt to convert
-    // raw strings into domain types with validation
-
+// ApplyDefaults sets defaults on the empty value before any layer is decoded.
+func (c *MyConfig) ApplyDefaults(args cfgstore.DefaultsArgs) error {
+    c.Theme = "light"
     return nil
 }
 
-// RootConfig is a marker method
-func (c *MyConfig) RootConfig() {}
-```
-
-#### Understanding Merge()
-
-The `Merge()` method enables hierarchical configuration with precedence rules. It's called during `LoadConfigStores()` (and so by `LoadConfig()` and `LoadDefaultConfig()`) when more than one layer loads.
-
-**How Merge Works:**
-1. Configs are loaded in DirTypes array order (e.g., CLI first, then Project)
-2. For each later config, `Merge()` is called on it with the merge of every earlier config as its argument
-3. `Merge()` returns the merged config, as a value of its receiver's own concrete type
-4. The loader returns the result of the last `Merge()`: every layer's values, not just the last layer's
-
-When only one layer loads, it is returned as loaded and `Merge()` is not called.
-
-**Example with CLIConfigDirType → ProjectConfigDirType:**
-```go
-// In merging loop:
-rc = projectConfig.Merge(cliConfig)
-// projectConfig values take precedence over cliConfig values by default
-```
-
-**Precedence rules:**
-
-The receiver is the later, more specific layer (e.g. the project), and the parameter is the merge of the earlier, more general layers (e.g. the CLI config in `~/.config/myapp`, called "global" below). Each field picks one of these rules:
-
-| Rule | Result |
-|------|--------|
-| project-wins (the default) | The receiver's value when set, otherwise the parameter's |
-| project-only | The receiver's value, even when empty; the parameter's is ignored |
-| global-only | The parameter's value, even when empty; the receiver's is ignored |
-| global-wins | The parameter's value when set, otherwise the receiver's |
-
-**Implementation Pattern:**
-```go
-type MyConfig struct {
-    Username     string `json:"username"`       // project-wins
-    Theme        string `json:"theme"`          // project-wins
-    Port         int    `json:"port"`           // project-wins
-    ProjectName  string `json:"project_name"`   // project-only
-    GlobalAPIKey string `json:"global_api_key"` // global-only
-    Registry     string `json:"registry"`       // global-wins
+// Merge decodes the layer's file over c.
+func (c *MyConfig) Merge(args cfgstore.MergeArgs[*MyConfig]) error {
+    return args.Decode(c)
 }
 
-// Merge combines other, the merge of the earlier layers, into c and returns
-// the result as a *MyConfig.
-func (c *MyConfig) Merge(other RootConfig) RootConfig {
-    otherCfg := other.(*MyConfig)
+// Normalize cleans values; it runs after every layer, so it must be idempotent.
+func (c *MyConfig) Normalize(args cfgstore.NormalizeArgs) error {
+    c.Editor = strings.ToLower(c.Editor)
+    return nil
+}
 
-    // Start with self
-    result := *c
-
-    // project-wins: keep the receiver's value, fill it from other when empty
-    if result.Username == "" {
-        result.Username = otherCfg.Username
-    }
-    if result.Theme == "" {
-        result.Theme = otherCfg.Theme
-    }
-    if result.Port == 0 {
-        result.Port = otherCfg.Port
-    }
-
-    // project-only: keep the receiver's value, even when empty, so a project
-    // name set in ~/.config/myapp never leaks into a project
-    // (result.ProjectName is already c.ProjectName)
-
-    // global-only: take other's value, even when empty, so a project file
-    // cannot set the API key
-    result.GlobalAPIKey = otherCfg.GlobalAPIKey
-
-    // global-wins: take other's value when set, otherwise keep the receiver's
-    if otherCfg.Registry != "" {
-        result.Registry = otherCfg.Registry
-    }
-
-    return &result
+// Validate checks values that span fields, on each file decoded alone.
+func (c *MyConfig) Validate(args cfgstore.ValidateArgs) error {
+    return nil
 }
 ```
 
-**Key Points:**
-- `Merge()` must return a non-nil value of its receiver's own concrete type (here `*MyConfig`). Loading fails with an error wrapping `ErrFailedToLoadConfig`, naming the layer and both types, when it returns `nil` or another type
-- The receiver (config calling Merge) has higher precedence by default
-- The parameter (config passed to Merge) has lower precedence by default
-- The implementer picks the rule that makes sense for each field
-- Returning a new merged config is clearest, but a `Merge()` that edits its receiver and returns it gives the same loaded result
+With `~/.config/myapp/config.json` holding `{"theme": "dark"}` and `./.myapp/config.json` holding `{"editor": "vim"}`, the loaded config has `Theme: "dark"` (the CLI layer's, not the default) and `Editor: "vim"`.
+
+#### ApplyDefaults()
+
+`ApplyDefaults()` is the place for defaults. It runs on an empty value before any layer's file is decoded, so a default survives every layer that omits its key. `DefaultsArgs` carries the `Options` and the `DirTypes` being loaded.
+
+When go-cfgstore creates a missing CLI (or app) config file, it calls `ApplyDefaults()` and `Normalize()` on a new value and saves it, so the file shows the user every default. `InitProjectConfig()` writes no defaults to the project file — a project file holding every default would override each user's CLI settings — and omits zero-valued fields from it; the config it returns has `ApplyDefaults()` applied.
+
+#### Merge()
+
+`Merge()` combines one layer's file into the value built from every earlier layer. Its common body is one line:
+
+```go
+func (c *MyConfig) Merge(args cfgstore.MergeArgs[*MyConfig]) error {
+    return args.Decode(c)
+}
+```
+
+`args.Decode(c)` decodes the layer's file over `c` with `encoding/json/v2`:
+
+- a field whose key the file omits is left unchanged;
+- a map's entries merge into the earlier map;
+- a slice replaces the earlier slice;
+- a key set to `null` resets its field to zero.
+
+Two field types change the rule for one field:
+
+| Type | Later layer's value |
+|------|---------------------|
+| `cfgstore.AppendSlice[T]` | Its elements are appended to the earlier elements (`null` empties it) |
+| `cfgstore.ReplaceMap[K, V]` | Replaces the earlier map instead of merging into it |
+
+Both marshal as their plain JSON array or object.
+
+For a rule the decoder cannot express, `args.Layer()` returns the layer's file decoded alone, and `Merge()` can combine it with `c` by hand. `MergeArgs` also carries the layer's `DirType`, `SourceFile` and `Options`.
+
+```go
+// Merge keeps the highest Level any layer sets.
+func (c *MyConfig) Merge(args cfgstore.MergeArgs[*MyConfig]) (err error) {
+    prev := c.Level
+    err = args.Decode(c)
+    if err == nil {
+        c.Level = max(prev, c.Level)
+    }
+    return err
+}
+```
+
+#### Understanding Normalize()
+
+`Normalize()` runs after each layer's `Merge()`, on the value built from every layer so far, with that layer's `DirType` and `SourceFile` in `NormalizeArgs`. Use it to clean values: lowercase a name, resolve a relative path, stamp a schema version.
+
+- It runs once per layer on the same value, so it **must be idempotent**: running it twice gives the same result as running it once.
+- It **must not set defaults**; that is `ApplyDefaults()`'s job.
+- It **must not validate**; that is `Validate()`'s job, or a field type's.
+
+#### Validate() and FieldValidator
+
+`Validate()` runs once per file, on that file decoded alone, with the file's `DirType`, `SourceFile` and `Options` in `ValidateArgs`, so a problem is reported against the file that has it. Use it for checks that span fields.
+
+A field type that checks its own value implements `cfgstore.FieldValidator`:
+
+```go
+type Color string
+
+func (c Color) Validate() error {
+    switch c {
+    case "", "red", "green", "blue":
+        return nil
+    }
+    return fmt.Errorf("unknown color %q", string(c))
+}
+```
+
+go-cfgstore calls `Validate()` on every such field, wherever it sits in the config. A field type should accept any raw value when it is decoded and report the problem from `Validate()`: a decode error stops decoding of that file, which hides every later problem in it, while `Validate()` errors are all collected and reported together.
 
 **Wrapper Pattern:**
 
@@ -990,9 +1010,24 @@ type MyConfigWrapper struct {
     MyConfig  // Embed the actual config
 }
 
+func (w *MyConfigWrapper) RootConfig() {}
+
+func (w *MyConfigWrapper) ApplyDefaults(args cfgstore.DefaultsArgs) error {
+    return w.MyConfig.ApplyDefaults(args)
+}
+
 func (w *MyConfigWrapper) Normalize(args cfgstore.NormalizeArgs) error {
-    // Delegate to embedded struct's Normalize, or implement here
     return w.MyConfig.Normalize(args)
+}
+
+func (w *MyConfigWrapper) Validate(args cfgstore.ValidateArgs) error {
+    return w.MyConfig.Validate(args)
+}
+
+// Merge decodes the layer over the wrapper, which UnmarshalJSON passes on to
+// the embedded struct.
+func (w *MyConfigWrapper) Merge(args cfgstore.MergeArgs[*MyConfigWrapper]) error {
+    return args.Decode(w)
 }
 
 // MarshalJSON delegates to the embedded struct
@@ -1003,16 +1038,6 @@ func (w *MyConfigWrapper) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON delegates to the embedded struct
 func (w *MyConfigWrapper) UnmarshalJSON(b []byte) error {
     return jsonv2.Unmarshal(b, &w.MyConfig)
-}
-
-func (w *MyConfigWrapper) RootConfig() {}
-
-// Merge delegates to the embedded struct and wraps the result, so it returns
-// a *MyConfigWrapper. Without it, the wrapper would inherit MyConfig's Merge,
-// which returns a *MyConfig, and loading two or more layers would fail.
-func (w *MyConfigWrapper) Merge(other cfgstore.RootConfig) cfgstore.RootConfig {
-    merged := w.MyConfig.Merge(&other.(*MyConfigWrapper).MyConfig)
-    return &MyConfigWrapper{MyConfig: *merged.(*MyConfig)}
 }
 ```
 
@@ -1062,7 +1087,7 @@ type RootConfig struct {
 
 func (*RootConfig) Config() {}
 func (c *RootConfig) Region() string { return c.RegionName }
-// ...plus RootConfig(), Normalize() and Merge() for cfgstore.RootConfig.
+// ...plus RootConfig(), ApplyDefaults(), Normalize(), Validate() and Merge().
 
 type Options struct {
     *cliutil.GlobalOptions

@@ -39,3 +39,11 @@ var (
 var ErrInvalidConfigFilepath = errors.New("invalid config filepath")
 
 var ErrNoRootConfigsLoaded = errors.New("no root configs loaded")
+
+var (
+	ErrInvalidConfig           = errors.New("invalid config")
+	ErrInvalidConfigValue      = errors.New("invalid config value")
+	ErrFailedToApplyDefaults   = errors.New("failed to apply config defaults")
+	ErrFailedToMergeConfig     = errors.New("failed to merge config")
+	ErrFailedToNormalizeConfig = errors.New("failed to normalize config")
+)

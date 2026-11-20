@@ -97,24 +97,60 @@ func ProjectConfigStoreExists(projectDir dt.DirPath, configSlug dt.PathSegment, 
 	return exists
 }
 
-// InitProjectConfig initializes a project config.
-// Returns the initialized config and an error (ErrConfigAlreadyExists if config already exists).
+// InitProjectConfig creates a project config file and returns the config a
+// load of that file alone would return. The file holds no defaults, only what
+// Normalize sets on an empty value: a project file holding every default would
+// override each user's CLI-layer settings. The returned config has
+// ApplyDefaults applied, then the file merged and normalized over it.
+// It returns ErrConfigAlreadyExists if the file already exists.
 func InitProjectConfig[RC any, PRC RootConfigPtr[RC]](
 	configSlug dt.PathSegment,
 	configFile dt.RelFilepath,
 	opts Options,
 ) (prc PRC, err error) {
-	var cs *configStore
+	var fp dt.Filepath
+	var data []byte
 
+	dirTypes := []DirType{ProjectConfigDirType}
 	store := NewProjectConfigStore(configSlug, configFile)
-	cs = store.(*configStore)
-	prc = PRC(new(RC))
+	saved := makeRootConfig[RC, PRC]()
 
-	err = cs.initConfig(prc, ProjectConfigDirType, opts)
+	if store.Exists() {
+		err = ErrConfigAlreadyExists
+		goto end
+	}
+	fp, err = store.GetFilepath()
 	if err != nil {
 		goto end
 	}
-
+	err = saved.Normalize(NormalizeArgs{
+		DirType:    ProjectConfigDirType,
+		SourceFile: fp,
+		Options:    opts,
+	})
+	if err != nil {
+		err = NewErr(ErrFailedToNormalizeConfig, err)
+		goto end
+	}
+	// A zero field is omitted whatever its omitempty tag says: written as 0,
+	// false or "", it would override the CLI layer's value for it.
+	data, err = jsonv2.Marshal(saved, jsontext.WithIndent("  "), jsonv2.OmitZeroStructFields(true))
+	if err != nil {
+		goto end
+	}
+	err = store.Save(data)
+	if err != nil {
+		goto end
+	}
+	prc, err = layerConfigs[RC, PRC]([]configLayer[PRC]{{
+		dirType: ProjectConfigDirType,
+		fp:      fp,
+		data:    data,
+		value:   saved,
+	}}, RootConfigArgs{
+		DirTypes: dirTypes,
+		Options:  opts,
+	})
 end:
 	return prc, err
 }
@@ -353,26 +389,21 @@ func (cs *configStore) ConfigSlug() dt.PathSegment {
 	return cs.configSlug
 }
 
-// ensureConfig loads the config file into rc when the file exists and creates
-// the file from rc when it is missing. Whether the file exists is the only thing
-// that decides: an existing file is never written, even when it decodes to a
-// zero rc, because a file holding only keys rc does not declare (one written by
-// a newer binary, say) decodes to zero too, and rewriting it would erase them.
-func (cs *configStore) ensureConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
-	if !cs.Exists() {
-		err = cs.createConfig(rc, dirType, opts)
-		goto end
-	}
-	err = cs.loadConfigIfExists(rc, dirType, opts)
-end:
-	return err
-}
-
-func (cs *configStore) createConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
+// createConfig creates a missing config file holding rc's defaults, run
+// through Normalize.
+func (cs *configStore) createConfig(rc RootConfig, dirType DirType, opts Options, dirTypes []DirType) (err error) {
 	var fp dt.Filepath
 
 	fp, err = cs.GetFilepath()
 	if err != nil {
+		goto end
+	}
+	err = rc.ApplyDefaults(DefaultsArgs{
+		Options:  opts,
+		DirTypes: dirTypes,
+	})
+	if err != nil {
+		err = NewErr(ErrFailedToApplyDefaults, err)
 		goto end
 	}
 	err = rc.Normalize(NormalizeArgs{
@@ -381,55 +412,11 @@ func (cs *configStore) createConfig(rc RootConfig, dirType DirType, opts Options
 		Options:    opts,
 	})
 	if err != nil {
+		err = NewErr(ErrFailedToNormalizeConfig, err)
 		goto end
 	}
 	err = cs.SaveJSON(rc)
-	if err != nil {
-		goto end
-	}
 end:
-	return err
-}
-
-// InitConfig initializes a new config, returning an error if it already exists
-func (cs *configStore) initConfig(rc RootConfig, dirType DirType, opts Options) (err error) {
-	if cs.Exists() {
-		err = ErrConfigAlreadyExists
-		goto end
-	}
-	err = cs.createConfig(rc, dirType, opts)
-end:
-	return err
-}
-
-func (cs *configStore) loadConfigIfExists(rc RootConfig, dirType DirType, opts Options) (err error) {
-	var fp dt.Filepath
-	if !cs.Exists() {
-		goto end
-	}
-
-	err = cs.LoadJSON(rc)
-	if err != nil {
-		goto end
-	}
-	fp, err = cs.GetFilepath()
-	if err != nil {
-		goto end
-	}
-	err = rc.Normalize(NormalizeArgs{
-		DirType:    dirType,
-		SourceFile: fp,
-		Options:    opts,
-	})
-	if err != nil {
-		goto end
-	}
-end:
-	if err != nil {
-		err = WithErr(err,
-			"config_file", fp,
-		)
-	}
 	return err
 }
 

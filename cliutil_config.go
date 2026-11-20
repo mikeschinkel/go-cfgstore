@@ -7,9 +7,8 @@ import (
 // CLIRootConfigPtr constrains the root config a go-cliutil app loads: *RC must
 // be both a go-cfgstore RootConfig and a go-cliutil Config.
 type CLIRootConfigPtr[RC any] interface {
-	RootConfig
+	RootConfigPtr[RC]
 	cliutil.Config
-	*RC
 }
 
 // CLIConfigArgs configures CLIConfigFunc. Both fields are optional and default

@@ -22,19 +22,13 @@ type cliConfig struct {
 	FormatValue string `json:"format,omitempty"`
 }
 
-func (c *cliConfig) Config()                                {}
-func (c *cliConfig) RootConfig()                            {}
-func (c *cliConfig) Normalize(cfgstore.NormalizeArgs) error { return nil }
-func (c *cliConfig) Merge(other cfgstore.RootConfig) cfgstore.RootConfig {
-	result := *c
-	earlier := other.(*cliConfig)
-	if result.RegionValue == "" {
-		result.RegionValue = earlier.RegionValue
-	}
-	if result.FormatValue == "" {
-		result.FormatValue = earlier.FormatValue
-	}
-	return &result
+func (c *cliConfig) Config()                                   {}
+func (c *cliConfig) RootConfig()                               {}
+func (c *cliConfig) ApplyDefaults(cfgstore.DefaultsArgs) error { return nil }
+func (c *cliConfig) Normalize(cfgstore.NormalizeArgs) error    { return nil }
+func (c *cliConfig) Validate(cfgstore.ValidateArgs) error      { return nil }
+func (c *cliConfig) Merge(args cfgstore.MergeArgs[*cliConfig]) error {
+	return args.Decode(c)
 }
 
 // Region returns the configured region.

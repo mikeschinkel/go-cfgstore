@@ -1,11 +1,10 @@
 package cfgstore
 
 import (
+	jsonv2 "encoding/json/v2"
 	"errors"
-	"fmt"
 
 	"github.com/mikeschinkel/go-dt"
-	"github.com/mikeschinkel/go-dt/dtx"
 )
 
 type ConfigStoreMap map[DirType]ConfigStore
@@ -67,24 +66,39 @@ func (stores *ConfigStores) FirstStore() (cs ConfigStore) {
 	return stores.StoreMap[stores.DirTypes[0]].(*configStore)
 }
 
+var ErrNotValidConfigDirsAvailable = errors.New("not valid config dirs available")
+
 type RootConfigArgs struct {
 	DirTypes     []DirType
 	Options      Options
 	DirsProvider *DirsProvider
 }
 
-type RootConfigPtr[RC any] interface {
-	RootConfig
-	*RC
-}
-
 func makeRootConfig[RC any, PRC RootConfigPtr[RC]]() PRC {
 	return PRC(new(RC))
 }
 
-// LoadConfigStores loads and merges root configuration from multiple config stores.
+// configLayer is one layer's file, read and decoded alone by the check pass.
+type configLayer[PRC any] struct {
+	dirType DirType
+	fp      dt.Filepath
+	data    []byte
+	value   PRC
+}
+
+// LoadConfigStores loads root configuration from multiple config stores.
 // Later stores in the DirTypes array take precedence over earlier ones.
 // This is the low-level function that provides maximum control over the loading process.
+//
+// Loading runs in two passes:
+//
+//  1. The check pass reads each layer's file, creating a missing CLI or app
+//     file and skipping a missing project file, and decodes it alone. It calls
+//     Validate on every field implementing FieldValidator and then
+//     RootConfig.Validate, and fails the load with every error from every file.
+//  2. The layered pass calls ApplyDefaults on a new value, then for each layer
+//     in order calls Merge, which decodes the layer's file over the value, and
+//     Normalize. It stops at the first layer whose Merge or Normalize fails.
 //
 // Use this when you need to:
 // - Pre-create ConfigStores for reuse
@@ -94,8 +108,7 @@ func makeRootConfig[RC any, PRC RootConfigPtr[RC]]() PRC {
 // For simpler use cases, consider using LoadConfig, LoadCLIConfig, LoadProjectConfig,
 // or LoadDefaultConfig instead.
 func LoadConfigStores[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args RootConfigArgs) (prc PRC, err error) {
-	var cs *configStore
-	var errs []error
+	var layers []configLayer[PRC]
 
 	if len(args.DirTypes) == 0 {
 		args.DirTypes = []DirType{
@@ -104,135 +117,154 @@ func LoadConfigStores[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args 
 		}
 	}
 
-	rcMap := make(map[DirType]PRC, len(args.DirTypes))
-	for dirType, store := range stores.StoreMap {
-		cs = store.(*configStore)
-		if args.DirsProvider != nil {
-			cs.dirsProvider = args.DirsProvider
-		}
-		tmpPRC := makeRootConfig[RC, PRC]()
-		switch dirType {
-		case ProjectConfigDirType:
-			err = cs.loadConfigIfExists(tmpPRC, dirType, args.Options)
-			if err == nil && (tmpPRC == nil || dtx.IsZero(tmpPRC)) {
-				rcMap[dirType] = nil
-				continue
-			}
-		default:
-			err = cs.ensureConfig(tmpPRC, dirType, args.Options)
-		}
-		if err != nil {
-			fp, _ := cs.GetFilepath()
-			errs = append(errs, NewErr(
-				ErrFailedToEnsureConfig,
-				"filepath", fp,
-				err,
-			))
-			continue
-		}
-		rcMap[dirType] = tmpPRC
-	}
-	err = CombineErrs(errs)
+	layers, err = checkConfigLayers[RC, PRC](stores, args)
 	if err != nil {
 		goto end
 	}
-
-	prc, err = mergeRootConfigs[RC, PRC](rcMap, args)
-
+	if len(layers) == 0 {
+		err = NewErr(ErrNotValidConfigDirsAvailable)
+		goto end
+	}
+	prc, err = layerConfigs[RC, PRC](layers, args)
 end:
 	return prc, err
 }
 
-var ErrNotValidConfigDirsAvailable = errors.New("not valid config dirs available")
-var ErrDirTypeNotAssignAfterMerge = errors.New("dirType not assigned after merge")
+// checkConfigLayers is the check pass: it returns each layer whose file exists,
+// in args.DirTypes order, or every error found in every file.
+func checkConfigLayers[RC any, PRC RootConfigPtr[RC]](stores *ConfigStores, args RootConfigArgs) (layers []configLayer[PRC], err error) {
+	var errs []error
 
-// mergeRootConfigs also specifying the config stores in a map to enable unit testing
-func mergeRootConfigs[RC any, PRC RootConfigPtr[RC]](rcMap map[DirType]PRC, args RootConfigArgs) (prc PRC, err error) {
+	for _, dirType := range args.DirTypes {
+		var layer configLayer[PRC]
+		var lerr error
 
-	var rc RootConfig
-	var dirType DirType
-	var start, cnt int
-
-	// First, count the valid configs
-	for _, typ := range args.DirTypes {
-		if rcMap[typ] == nil {
+		store, ok := stores.StoreMap[dirType]
+		if !ok {
 			continue
 		}
-		cnt++
-	}
-
-	// Then find the first valid config
-	for i, typ := range args.DirTypes {
-		if rcMap[typ] == nil {
+		cs := store.(*configStore)
+		if args.DirsProvider != nil {
+			cs.dirsProvider = args.DirsProvider
+		}
+		layer, ok, lerr = readConfigLayer[RC, PRC](cs, dirType, args)
+		if lerr != nil {
+			// TODO(E-2658): a file that fails to read or decode lands here, which
+			// is where detecting, repairing or quarantining a corrupt config file
+			// would hook in.
+			errs = append(errs, NewErr(
+				ErrFailedToEnsureConfig,
+				"filepath", layer.fp,
+				lerr,
+			))
 			continue
 		}
-		// This is our starting config
-		prc = rcMap[typ]
-		rc = RootConfig(rcMap[typ])
-		// Skip over this config
-		start = i + 1
-		break
+		if !ok {
+			continue
+		}
+		errs = append(errs, validateConfigLayer(layer, args.Options)...)
+		layers = append(layers, layer)
 	}
-	if rc == nil {
-		// If we did not find any valid configs, return an error
-		err = NewErr(ErrNotValidConfigDirsAvailable)
+	err = CombineErrs(errs)
+	if err != nil {
+		layers = nil
+	}
+	return layers, err
+}
+
+// readConfigLayer reads and decodes dirType's file alone. It creates a missing
+// file for any layer but the project layer, and reports ok=false for a missing
+// project file.
+func readConfigLayer[RC any, PRC RootConfigPtr[RC]](cs *configStore, dirType DirType, args RootConfigArgs) (layer configLayer[PRC], ok bool, err error) {
+	layer.dirType = dirType
+	layer.fp, err = cs.GetFilepath()
+	if err != nil {
 		goto end
 	}
-	if cnt <= 1 {
-		// If we only found one valid config this is our prc
-		goto end
-	}
-	// Now merge the second config with the next, until we have merged all. OTOH, if
-	// there was only one valid config, this loop will not end up merging anything.
-	for i := start; i < len(args.DirTypes); i++ {
-		typ := args.DirTypes[i]
-		if rcMap[typ] == nil {
-			continue
+	if !cs.Exists() {
+		if dirType == ProjectConfigDirType {
+			goto end
 		}
-		rc = rcMap[typ].Merge(rc)
-		// Capture the key for the last merged config
-		dirType = typ
-		prc, err = mergedRootConfig[RC, PRC](rc, typ)
+		err = cs.createConfig(makeRootConfig[RC, PRC](), dirType, args.Options, args.DirTypes)
 		if err != nil {
 			goto end
 		}
 	}
-	if dirType == UnspecifiedConfigDirType {
-		// This should never happen - indicates a logic bug
-		err = NewErr(
-			dt.ErrUnexpectedError,
-			dt.ErrInternalError,
-			ErrDirTypeNotAssignAfterMerge,
-			"config_count", cnt,
-		)
+	layer.data, err = cs.Load()
+	if err != nil {
+		err = NewErr(ErrFailedToReadConfigFile, err)
 		goto end
 	}
+	layer.value = makeRootConfig[RC, PRC]()
+	err = jsonv2.Unmarshal(layer.data, layer.value)
+	if err != nil {
+		err = NewErr(ErrFailedToUnmarshalConfigFile, err)
+		goto end
+	}
+	ok = true
 end:
-	return prc, err
+	return layer, ok, err
 }
 
-// mergedRootConfig converts the RootConfig that dirType's Merge returned back to
-// the caller's PRC, failing when Merge returned nil or another concrete type.
-func mergedRootConfig[RC any, PRC RootConfigPtr[RC]](rc RootConfig, dirType DirType) (prc PRC, err error) {
-	var returned string
-	var ok bool
+// validateConfigLayer validates a layer's file decoded alone: every
+// FieldValidator field, then RootConfig.Validate.
+func validateConfigLayer[PRC RootConfig](layer configLayer[PRC], opts Options) (errs []error) {
+	errs = validateFields(layer.value, layer.fp)
+	err := layer.value.Validate(ValidateArgs{
+		DirType:    layer.dirType,
+		SourceFile: layer.fp,
+		Options:    opts,
+	})
+	if err != nil {
+		errs = append(errs, NewErr(ErrInvalidConfig, "config_file", layer.fp, err))
+	}
+	return errs
+}
 
-	prc, ok = rc.(PRC)
-	switch {
-	case rc == nil, ok && prc == nil:
-		returned = "nil"
-	case !ok:
-		returned = fmt.Sprintf("%T", rc)
-	default:
+// layerConfigs is the layered pass: defaults, then each layer's Merge and
+// Normalize, in order.
+func layerConfigs[RC any, PRC RootConfigPtr[RC]](layers []configLayer[PRC], args RootConfigArgs) (prc PRC, err error) {
+	var layer configLayer[PRC]
+
+	prc = makeRootConfig[RC, PRC]()
+	err = prc.ApplyDefaults(DefaultsArgs{
+		Options:  args.Options,
+		DirTypes: args.DirTypes,
+	})
+	if err != nil {
+		err = NewErr(ErrFailedToApplyDefaults, err)
 		goto end
 	}
-	err = NewErr(
-		ErrFailedToLoadConfig,
-		"dir_type", dirType,
-		"expected_type", fmt.Sprintf("%T", prc),
-		"returned_type", returned,
-	)
-	prc = nil
+	for _, layer = range layers {
+		err = prc.Merge(MergeArgs[*RC]{
+			DirType:    layer.dirType,
+			SourceFile: layer.fp,
+			Options:    args.Options,
+			data:       layer.data,
+			layer:      layer.value,
+		})
+		if err != nil {
+			err = NewErr(ErrFailedToMergeConfig, err)
+			goto end
+		}
+		err = prc.Normalize(NormalizeArgs{
+			DirType:    layer.dirType,
+			SourceFile: layer.fp,
+			Options:    args.Options,
+		})
+		if err != nil {
+			err = NewErr(ErrFailedToNormalizeConfig, err)
+			goto end
+		}
+	}
 end:
+	if err != nil {
+		err = WithErr(err,
+			ErrFailedToLoadConfig,
+			"dir_type", layer.dirType,
+			"config_file", layer.fp,
+		)
+		prc = nil
+	}
 	return prc, err
 }

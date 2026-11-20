@@ -38,15 +38,16 @@ func TestRun(t *testing.T) {
 		"Project:       <root>/project/.cfgstore-comprehensive",
 		"App:           <root>/appconfig/cfgstore-comprehensive",
 		"project file:  <root>/project/.cfgstore-comprehensive/config.json",
-		"merged: theme=dark editor=helix layers=[cli project]",
+		"merged: theme=dark editor=helix source=project",
 		"cli only:     theme=dark editor=vim",
-		"project only: theme= editor=helix",
+		"project only: theme=light editor=helix",
 		"exists: true",
 		"exists elsewhere: false",
 		"created:       <root>/newproject/.cfgstore-comprehensive/config.json",
+		"init: theme=light source=project",
 		"second call: config already exists",
 		"app cache:     <root>/cache/cfgstore-comprehensive/cli",
-		"fresh CLI config created: layers=[cli]",
+		"fresh CLI config created: theme=light source=cli",
 	} {
 		if !strings.Contains(out.String(), want) {
 			t.Errorf("output lacks %q:\n%s", want, out.String())

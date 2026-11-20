@@ -39,39 +39,41 @@ func main() {
 	}
 }
 
-// Config is the app's root config. Normalize and Merge make it a
-// cfgstore.RootConfig; the json:"-" fields record what loading did.
+// Config is the app's root config. ApplyDefaults, Normalize, Validate and Merge
+// make it a cfgstore.RootConfig; the json:"-" field records what loading did.
 type Config struct {
-	Theme  string   `json:"theme,omitempty"`
-	Editor string   `json:"editor,omitempty"`
-	Layers []string `json:"-"`
+	Theme  string `json:"theme,omitempty"`
+	Editor string `json:"editor,omitempty"`
+	Source string `json:"-"`
 }
 
 // RootConfig marks Config as a cfgstore.RootConfig.
 func (c *Config) RootConfig() {}
 
-// Normalize runs once per layer after the file loads, or before a missing file
-// is created. It cleans values and records which layer it came from. It sets no
-// defaults: a default in a later layer would hide an earlier layer's value.
-func (c *Config) Normalize(args cfgstore.NormalizeArgs) error {
-	c.Editor = strings.ToLower(c.Editor)
-	c.Layers = []string{args.DirType.Slug()}
+// ApplyDefaults sets the theme default. It runs on an empty Config before any
+// layer's file is decoded, so a layer that sets theme replaces the default, and
+// a later layer that omits theme leaves an earlier layer's theme in place.
+func (c *Config) ApplyDefaults(cfgstore.DefaultsArgs) error {
+	c.Theme = "light"
 	return nil
 }
 
-// Merge combines earlier, the merge of every earlier layer, into c, a later
-// layer. c's values win; earlier fills the fields c leaves empty.
-func (c *Config) Merge(earlier cfgstore.RootConfig) cfgstore.RootConfig {
-	prev := earlier.(*Config)
-	merged := *c
-	if merged.Theme == "" {
-		merged.Theme = prev.Theme
-	}
-	if merged.Editor == "" {
-		merged.Editor = prev.Editor
-	}
-	merged.Layers = append(append([]string{}, prev.Layers...), c.Layers...)
-	return &merged
+// Normalize runs after each layer is merged. It cleans values and records the
+// last layer it ran for; running it twice gives the same result as once.
+func (c *Config) Normalize(args cfgstore.NormalizeArgs) error {
+	c.Editor = strings.ToLower(c.Editor)
+	c.Source = args.DirType.Slug()
+	return nil
+}
+
+// Validate runs on each layer's file decoded alone; this config has nothing
+// to check across fields.
+func (c *Config) Validate(cfgstore.ValidateArgs) error { return nil }
+
+// Merge decodes a layer's file over c, the value built from every earlier
+// layer: a key the file sets wins, and a key it omits keeps c's value.
+func (c *Config) Merge(args cfgstore.MergeArgs[*Config]) error {
+	return args.Decode(c)
 }
 
 // demo holds what every step shares.
@@ -90,7 +92,7 @@ func run(w io.Writer, root dt.DirPath) (err error) {
 		{"CreateWriterLogger", d.writerLogger},
 		{"Config directories from a custom DirsProvider", d.configDirs},
 		{"Save, SaveJSON and EnsureDirs on config stores", d.saveStores},
-		{"Layered loading with Normalize and Merge", d.layeredLoad},
+		{"Layered loading with ApplyDefaults, Merge and Normalize", d.layeredLoad},
 		{"Loading one layer", d.singleLayers},
 		{"ProjectConfigStoreExists", d.projectExists},
 		{"InitProjectConfig", d.initProject},
@@ -225,7 +227,8 @@ end:
 	return err
 }
 
-// layeredLoad loads CLI then project config; the project layer wins.
+// layeredLoad loads CLI then project config. The project file sets only editor,
+// so the CLI file's theme survives, and the theme default does not replace it.
 func (d *demo) layeredLoad() (err error) {
 	var cfg *Config
 	cfg, err = cfgstore.LoadConfig[Config](cfgstore.LoadConfigArgs{
@@ -236,7 +239,7 @@ func (d *demo) layeredLoad() (err error) {
 	if err != nil {
 		goto end
 	}
-	d.printf("merged: theme=%s editor=%s layers=%v\n", cfg.Theme, cfg.Editor, cfg.Layers)
+	d.printf("merged: theme=%s editor=%s source=%s\n", cfg.Theme, cfg.Editor, cfg.Source)
 end:
 	return err
 }
@@ -256,7 +259,8 @@ func (d *demo) singleLayers() (err error) {
 	if err != nil {
 		goto end
 	}
-	// Normalize lowercased the project file's "Helix".
+	// Normalize lowercased the project file's "Helix", and the theme default
+	// applies because the project file does not set theme.
 	d.printf("project only: theme=%s editor=%s\n", cfg.Theme, cfg.Editor)
 end:
 	return err
@@ -301,7 +305,7 @@ func (d *demo) initProject() (err error) {
 		goto end
 	}
 	d.show("created", string(dir.Join("."+string(configSlug), string(configFile))))
-	d.printf("layers: %v\n", cfg.Layers)
+	d.printf("init: theme=%s source=%s\n", cfg.Theme, cfg.Source)
 
 	_, err = cfgstore.InitProjectConfig[Config](configSlug, configFile, nil)
 	if !errors.Is(err, cfgstore.ErrConfigAlreadyExists) {
@@ -354,7 +358,7 @@ func (d *demo) cstestHelpers() (err error) {
 	if err != nil {
 		goto end
 	}
-	d.printf("fresh CLI config created: layers=%v\n", cfg.Layers)
+	d.printf("fresh CLI config created: theme=%s source=%s\n", cfg.Theme, cfg.Source)
 
 	rel, err = cstest.GetRelConfigDir(cfgstore.NewConfigStore(cfgstore.CLIConfigDirType, cfgstore.ConfigStoreArgs{
 		ConfigSlug:   configSlug,

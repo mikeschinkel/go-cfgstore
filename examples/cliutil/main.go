@@ -39,23 +39,20 @@ func (*RootConfig) Config() {}
 // RootConfig marks RootConfig as a cfgstore.RootConfig.
 func (*RootConfig) RootConfig() {}
 
+// ApplyDefaults sets no defaults: each flag's own default applies when config
+// leaves a value unset.
+func (*RootConfig) ApplyDefaults(cfgstore.DefaultsArgs) error { return nil }
+
 // Normalize has nothing to clean in this config.
 func (*RootConfig) Normalize(cfgstore.NormalizeArgs) error { return nil }
 
-// Merge fills the fields c, a later layer, leaves empty from earlier layers.
-func (c *RootConfig) Merge(earlier cfgstore.RootConfig) cfgstore.RootConfig {
-	prev := earlier.(*RootConfig)
-	merged := *c
-	if merged.VerbosityLevel == 0 {
-		merged.VerbosityLevel = prev.VerbosityLevel
-	}
-	if merged.RegionName == "" {
-		merged.RegionName = prev.RegionName
-	}
-	if merged.FormatName == "" {
-		merged.FormatName = prev.FormatName
-	}
-	return &merged
+// Validate has nothing to check in this config.
+func (*RootConfig) Validate(cfgstore.ValidateArgs) error { return nil }
+
+// Merge decodes a later layer's file over c; keys the file omits keep the
+// earlier layers' values.
+func (c *RootConfig) Merge(args cfgstore.MergeArgs[*RootConfig]) error {
+	return args.Decode(c)
 }
 
 // Verbosity returns the configured verbosity, or 0 when unset.

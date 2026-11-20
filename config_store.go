@@ -78,11 +78,19 @@ func NewProjectConfigStore(configSlug dt.PathSegment, configFile dt.RelFilepath)
 	})
 }
 
-// ProjectConfigStoreExists checks if a project config store exists at the specified project directory
+// ProjectConfigStoreExists takes a project directory and reports whether its
+// project config, <projectDir>/.<configSlug>/<configFile>, exists.
 func ProjectConfigStoreExists(projectDir dt.DirPath, configSlug dt.PathSegment, configFile dt.RelFilepath) (exists bool) {
 
-	store := NewProjectConfigStore(configSlug, configFile)
-	store.SetConfigDir(projectDir)
+	dp := DefaultDirsProvider()
+	dp.ProjectDirFunc = func() (dt.DirPath, error) {
+		return projectDir, nil
+	}
+	store := NewConfigStore(ProjectConfigDirType, ConfigStoreArgs{
+		ConfigSlug:   configSlug,
+		RelFilepath:  configFile,
+		DirsProvider: dp,
+	})
 	exists = store.Exists()
 
 	return exists

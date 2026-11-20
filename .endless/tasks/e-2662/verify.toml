@@ -1,0 +1,48 @@
+# Verification suite for E-2662 — ProjectConfigStoreExists checks <projectDir>/.<slug>/<file>.
+# DO NOT EDIT unless you ARE E-2662. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2662"
+
+# P1–P3: the test module, fail-fast, including TestProjectConfigStoreExists.
+[[check]]
+name   = "test module unit tests (P1–P3)"
+runner = "gotest"
+dir    = "test"
+paths  = ["./..."]
+
+# P6: the comprehensive example still expects exists: true / exists elsewhere: false.
+[[check]]
+name   = "P6: examples/comprehensive tests"
+runner = "gotest"
+dir    = "examples/comprehensive"
+paths  = ["./..."]
+
+# P6: the example passes the project directory, with no comment about the config dir.
+[[check]]
+name   = "P6: projectExists passes the project dir"
+sh     = "sed -n '/^func (d \\*demo) projectExists/,/^}/p' examples/comprehensive/main.go | grep -c 'ProjectConfigDir'; ! grep -n 'config directory, <project>' examples/comprehensive/main.go"
+equals = "0"
+
+# P4: ConfigDir supplies .<slug>; ProjectConfigStoreExists neither joins it nor calls SetConfigDir.
+[[check]]
+name   = "P4: ProjectConfigStoreExists does not join .<slug> or call SetConfigDir"
+sh     = "sed -n '/^func ProjectConfigStoreExists/,/^}/p' config_store.go | grep -cE '\"\\.\"|SetConfigDir'"
+equals = "0"
+
+# P5: the doc comment names the project directory and the slug path.
+[[check]]
+name     = "P5: doc comment describes <projectDir>/.<configSlug>/<configFile>"
+sh       = "grep -B3 '^func ProjectConfigStoreExists' config_store.go"
+contains = "<projectDir>/.<configSlug>/<configFile>"
+
+# P7: signature unchanged; SetConfigDir unchanged.
+[[check]]
+name     = "P7: signature and SetConfigDir unchanged"
+sh       = "git diff main -- config_store.go | grep -E '^[-+](func ProjectConfigStoreExists|func \\(cs \\*configStore\\) SetConfigDir|\\tcs\\.configDir = dir|\\tcs\\.fs = )' | wc -l | tr -d ' '"
+equals   = "0"
+
+# Build, vet and lint every module with golangci-lint v2.15.0.
+[[check]]
+name = "build, vet and golangci-lint v2.15.0 on every module"
+sh   = 'set -e; L=github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0; for m in . test examples/basic examples/comprehensive examples/cliutil; do case $m in examples/*) out=-o=/dev/null;; *) out=;; esac; (cd $m && GOWORK=off go build $out ./... && GOWORK=off go vet ./... && GOWORK=off go run $L run ./... --timeout=5m); done'

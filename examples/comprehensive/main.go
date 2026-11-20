@@ -262,11 +262,10 @@ end:
 	return err
 }
 
-// projectExists checks for a project config file without loading it. It takes
-// the project's config directory, <project>/.<slug>, not the project directory.
+// projectExists checks for a project config file without loading it.
 func (d *demo) projectExists() (err error) {
 	var dir dt.DirPath
-	dir, err = cfgstore.ProjectConfigDir(configSlug, d.dp)
+	dir, err = d.dp.ProjectDirFunc()
 	if err != nil {
 		goto end
 	}

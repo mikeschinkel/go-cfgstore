@@ -27,7 +27,7 @@ equals = "0"
 # P4: ConfigDir supplies .<slug>; ProjectConfigStoreExists neither joins it nor calls SetConfigDir.
 [[check]]
 name   = "P4: ProjectConfigStoreExists does not join .<slug> or call SetConfigDir"
-sh     = "sed -n '/^func ProjectConfigStoreExists/,/^}/p' config_store.go | grep -cE '\"\\.\"|SetConfigDir'"
+sh     = "sed -n '/^func ProjectConfigStoreExists/,/^}/p' config_store.go | grep -cE '\"\\.\"|SetConfigDir' || true"
 equals = "0"
 
 # P5: the doc comment names the project directory and the slug path.

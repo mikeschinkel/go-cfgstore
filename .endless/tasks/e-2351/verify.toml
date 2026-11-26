@@ -1,0 +1,78 @@
+# Verification suite for E-2351 — use go-dt's NoFileOrDirErr in go-cfgstore.
+# DO NOT EDIT unless you ARE E-2351. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2351"
+
+# The project's native tests first, fail-fast. The test module reaches
+# go-cfgstore through its own `..` replace and every other module by a
+# published version, so it runs in place with GOWORK=off.
+[[check]]
+name   = "test module unit tests"
+runner = "gotest"
+dir    = "test"
+paths  = ["./..."]
+
+# P1: cfgstore.NoFileOrDirErr is gone; the only mentions are dtx calls.
+[[check]]
+name   = "P1: no NoFileOrDirErr in *.go other than dtx.NoFileOrDirErr calls"
+sh     = 'git grep -n NoFileOrDirErr -- "*.go" | grep -v "dtx\.NoFileOrDirErr" || true'
+equals = ""
+
+[[check]]
+name   = "P1: util.go and config_store.go call dtx.NoFileOrDirErr"
+sh     = 'git grep -l "dtx\.NoFileOrDirErr" -- util.go config_store.go | LC_ALL=C sort | tr "\n" " "'
+equals = "config_store.go util.go "
+
+# P2: the sentinel is ErrFileNotExist everywhere.
+[[check]]
+name = "P2: no ErrFileDoesNotExist or ErrFileNotExistExist outside .endless"
+sh   = '! git grep -q -e ErrFileDoesNotExist -e ErrFileNotExistExist -- . ":!.endless"'
+
+[[check]]
+name   = "P2: errors.go declares ErrFileNotExist, config_store.go and README use it"
+sh     = 'git grep -l "\bErrFileNotExist\b" -- errors.go config_store.go README.md | LC_ALL=C sort | tr "\n" " "'
+equals = "README.md config_store.go errors.go "
+
+# P3: doterr.go is in sync with go-doterr.
+[[check]]
+name = "P3: doterr.go matches go-doterr's apart from the package clause"
+sh   = "bash \"$ENDLESS_VERIFY_DIR\"/doterr-sync.sh"
+
+# P4: go-dt >= v0.7.0 and dtx >= v0.3.0 in every module; no replace for
+# anything but the test and example modules' own `..` go-cfgstore replace.
+[[check]]
+name   = "P4: every go.mod requires go-dt at v0.7.x and dtx at v0.3.x"
+sh     = 'for f in go.mod test/go.mod examples/*/go.mod; do n=$(grep -cE "^\s*github.com/mikeschinkel/go-dt v0\.(7|[89]|[1-9][0-9])\.[0-9]+|^\s*github.com/mikeschinkel/go-dt/dtx v0\.([3-9]|[1-9][0-9])\.[0-9]+" "$f"); echo "$f=$n"; done | tr "\n" " "'
+equals = "go.mod=2 test/go.mod=2 examples/basic/go.mod=2 examples/cliutil/go.mod=2 examples/comprehensive/go.mod=2 "
+
+[[check]]
+name   = "P4: the only replace directives point the test and example modules at go-cfgstore"
+sh     = 'git grep -h "^replace " -- "*.mod" | sort -u'
+equals = "replace github.com/mikeschinkel/go-cfgstore => ..\nreplace github.com/mikeschinkel/go-cfgstore => ../.."
+
+# P7 (grown): every dependency is at its latest release.
+[[check]]
+name   = "P7: go list -m -u reports no newer release for any module's direct requirements"
+sh     = 'for m in . test examples/basic examples/cliutil examples/comprehensive; do (cd "$m" && GOWORK=off GOFLAGS=-mod=mod go list -m -u -f "{{if and .Update (not .Indirect)}}{{.Path}} {{.Version}} -> {{.Update.Version}}{{end}}" all 2>/dev/null | grep -v "^$" | sed "s#^#$m: #"); done'
+equals = ""
+
+# P5: build and vet pass with GOWORK=off in every module (tests ran above).
+[[check]]
+name = "P5: root module builds and vets with GOWORK=off"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
+
+[[check]]
+name = "P5: test module builds and vets with GOWORK=off"
+dir  = "test"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
+
+[[check]]
+name = "P5: every example module builds and vets with GOWORK=off"
+sh   = 'for m in examples/*/; do (cd "$m" && GOWORK=off go build -o /dev/null ./... && GOWORK=off go vet ./...) || exit 1; done'
+
+# P6 (exclusion): nothing from the WIP branch's other work came along.
+[[check]]
+name   = "P6: this branch adds no PLAN.md and touches no TruncateLog line"
+sh     = 'base=$(git merge-base main HEAD); git diff --name-only "$base" HEAD -- PLAN.md; git diff "$base" HEAD -- "*.go" | grep -c TruncateLog'
+equals = "0"

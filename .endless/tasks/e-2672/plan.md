@@ -19,7 +19,7 @@ Quiet and Verbosity are pointers because their zero values are real settings: Qu
 
 **Log location.** CreateWriterLogger calls CLIConfigDir(args.ConfigSlug, args.DirsProvider); CLIConfigDir already treats a nil provider as DefaultDirsProvider().
 
-**Callers.** examples/comprehensive and the tests in test/ move to the pointer fields. gomion's run_cli.go is E-2555's to change; gomion builds against this checkout through its replace directive, so it stops compiling from this task's landing until E-2555 lands.
+**Callers.** examples/comprehensive and the tests in test/ move to the pointer fields. gomion consumes this change only through a tagged go-cfgstore release (ED-1639; Mike, 2026-11-25), so after landing, this task tags the next go-cfgstore minor version; the field type changes break callers.
 
 **Tests** in test/writer_logger_test.go, each with a DirsProvider rooted under t.TempDir():
 - no Writer, nil Quiet and Verbosity: output at verbosity 1 appears and V2 output does not;

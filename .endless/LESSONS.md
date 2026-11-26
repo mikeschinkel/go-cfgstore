@@ -136,3 +136,7 @@ In E-2661 planning I said go-cfgstore being pre-v1.0 (v0.4.0) is what allows mak
 ### [2026-11-19] Write decisions in plain words a stranger can read
 Filing ED-1677 (go-cfgstore config layering, from E-2661 planning), I wrote the title and description in planning-session jargon: 'per-layer decode', 'field-by-field merge', 'presence-tracking wrapper types', 'sequential decode'. Mike asked for a rewrite without jargon or with each term defined, because a future reader of a decision has none of the conversation's context. Before filing a decision, reread it as a stranger: replace coined terms with what actually happens, or define them inline.
 - **Project**: go-cfgstore
+
+### [2026-11-26] precedes is an ordering edge in session status; downgrading blocks to precedes does not break a cycle
+Helping Mike resolve a 'cycle:' line in endless session status (E-2464, E-2469, E-2472, E-2540, E-2555, E-2568, E-2672, E-2673), the session recommended downgrading the three closing blocks edges to precedes. Mike ran it and the cycle stayed. internal/sessionstatuscmd/graph.go builds its graph from both DepBlocks and DepPrecedes and finds cycles as strongly connected components over both kinds, so precedes keeps a task in the cycle. To break a cycle an edge must be removed or changed to a kind the graph ignores (relates_to). Check how a tool interprets a relation before recommending it as the fix.
+- **Project**: go-cfgstore

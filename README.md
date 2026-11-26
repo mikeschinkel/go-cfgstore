@@ -1267,13 +1267,13 @@ The package uses the `doterr` pattern for structured errors with metadata:
 err := store.LoadJSON(&config)
 if err != nil {
     // Error contains rich context about what failed
-    // Examples: ErrFileDoesNotExist, ErrFailedToReadConfigFile, etc.
+    // Examples: ErrFileNotExist, ErrFailedToReadConfigFile, etc.
     log.Printf("Config error: %v", err)
 }
 ```
 
 Common errors:
-- `ErrFileDoesNotExist` - Config file not found
+- `ErrFileNotExist` - Config file not found
 - `ErrFailedToReadConfigFile` - File read error
 - `ErrFailedToUnmarshalConfigFile` - JSON parsing error
 - `ErrConfigDirTypeNotSet` - DirType not specified

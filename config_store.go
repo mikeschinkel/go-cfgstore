@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/mikeschinkel/go-dt"
+	"github.com/mikeschinkel/go-dt/dtx"
 )
 
 // DefaultConfigDirType is currently hardcoded for ~/.config but having this
@@ -271,8 +272,8 @@ func (cs *configStore) Load() (data []byte, err error) {
 	}
 
 	data, err = cs.relFilepath.ReadFile(fSys)
-	if NoFileOrDirErr(err) {
-		err = NewErr(ErrFileDoesNotExist, err)
+	if dtx.NoFileOrDirErr(err) {
+		err = NewErr(ErrFileNotExist, err)
 	}
 	if err != nil {
 		err = NewErr(ErrFailedToReadFile, err)

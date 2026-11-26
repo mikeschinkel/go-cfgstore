@@ -1,7 +1,6 @@
 package cstest
 
 import (
-	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -25,13 +24,20 @@ type TestDirsProviderArgs struct {
 	omitTestRoot  bool
 }
 
-func (args *TestDirsProviderArgs) RelConfigDir() dt.PathSegments {
-	return dt.PathSegments(filepath.Join(
-		"Users",
-		string(args.Username),
-		string(cfgstore.DotConfigPathSegment),
-		string(args.ConfigSlug),
-	))
+// RelConfigDir returns the CLI config dir for args.Username and args.ConfigSlug,
+// relative to the volume root, by the same per-OS rule as getTestCLIConfigDir.
+// It returns "" when args.Username is invalid.
+func (args *TestDirsProviderArgs) RelConfigDir() (rel dt.PathSegments) {
+	dir, err := getTestCLIConfigDir(args.Username)
+	if err != nil {
+		goto end
+	}
+	rel, err = relToVolumeRoot(dt.DirPathJoin(dir, args.ConfigSlug))
+	if err != nil {
+		rel = ""
+	}
+end:
+	return rel
 }
 
 func (args *TestDirsProviderArgs) OmitTestRoot() bool {
@@ -168,9 +174,15 @@ end:
 	return dir, err
 }
 
+// getTestCLIConfigDir mirrors cfgstore.DirsProvider.CLIConfigDirType: the user
+// config dir on Linux, and <home>/.config on every other OS.
 func getTestCLIConfigDir(username dt.PathSegment) (dir dt.DirPath, err error) {
 	var homeDir dt.DirPath
 
+	if runtime.GOOS == "linux" {
+		dir, err = getTestUserConfigDir(username)
+		goto end
+	}
 	homeDir, err = getTestUserHomeDir(username)
 	if err != nil {
 		goto end

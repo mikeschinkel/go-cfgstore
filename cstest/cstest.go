@@ -8,16 +8,25 @@ import (
 )
 
 func GetRelConfigDir(cs cfgstore.ConfigStore, args *TestDirsProviderArgs) (rel dt.PathSegments, err error) {
-	var vol dt.VolumeName
-	var dir, base dt.DirPath
+	var dir dt.DirPath
 
 	dir, err = args.WithoutTestRoot(func() (dt.DirPath, error) {
 		return cs.ConfigDir()
 	})
-
 	if err != nil {
 		goto end
 	}
+	rel, err = relToVolumeRoot(dir)
+end:
+	return rel, err
+}
+
+// relToVolumeRoot returns dir relative to its volume root: "/" on Unix, or
+// "C:\" or "\\server\\share\" on Windows.
+func relToVolumeRoot(dir dt.DirPath) (rel dt.PathSegments, err error) {
+	var vol dt.VolumeName
+	var base dt.DirPath
+
 	if len(dir) == 0 {
 		goto end
 	}

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mikeschinkel/go-cfgstore"
 	"github.com/mikeschinkel/go-dt"
 )
 
@@ -14,14 +15,26 @@ func TestRun(t *testing.T) {
 	t.Setenv("HOME", home)
 	t.Setenv("XDG_CONFIG_HOME", home+"/.config")
 
+	root := dt.DirPath(t.TempDir())
+
+	// The CLI config dir differs by OS, so ask cfgstore for it.
+	cliDir, err := cfgstore.CLIConfigDir(configSlug, newDirsProvider(root))
+	if err != nil {
+		t.Fatalf("CLIConfigDir: %v", err)
+	}
+	cliRel, err := cliDir.Rel(root)
+	if err != nil {
+		t.Fatalf("Rel: %v", err)
+	}
+
 	var out bytes.Buffer
-	err := run(&out, dt.DirPath(t.TempDir()))
+	err = run(&out, root)
 	if err != nil {
 		t.Fatalf("run: %v\n%s", err, out.String())
 	}
 	for _, want := range []string{
 		"writer ready",
-		"CLI:           <root>/home/.config/cfgstore-comprehensive",
+		"CLI:           <root>/" + string(cliRel) + "\n",
 		"Project:       <root>/project/.cfgstore-comprehensive",
 		"App:           <root>/appconfig/cfgstore-comprehensive",
 		"project file:  <root>/project/.cfgstore-comprehensive/config.json",

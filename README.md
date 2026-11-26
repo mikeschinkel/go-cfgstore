@@ -415,7 +415,7 @@ Configuration directory types determine where config files are stored. Understan
 
 **CLIConfigDir** (`~/.config/<slug>`):
 - **Purpose**: Configuration for **command-line tools** and **developer-focused applications**
-- **Location**: Always `~/.config/<slug>` on all platforms (UNIX convention)
+- **Location**: `~/.config/<slug>` on all platforms (UNIX convention); on Linux, `$XDG_CONFIG_HOME/<slug>` when `XDG_CONFIG_HOME` is set
 - **Visibility**: Easy to find, edit, and version control
 - **Use when**: Building CLI tools, developer utilities, or when users need direct file access
 - **Examples**: `git` config, `npm` config, command-line database tools

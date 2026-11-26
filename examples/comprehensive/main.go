@@ -122,7 +122,7 @@ func newDirsProvider(root dt.DirPath) *cfgstore.DirsProvider {
 		UserConfigDirFunc: at("appconfig"),
 		UserCacheDirFunc:  at("cache"),
 	}
-	// CLIConfigDirType is ~/.config, or XDG_CONFIG_HOME on Linux, under dp's home.
+	// CLIConfigDirType is dp's user config dir on Linux, and ~/.config under dp's home elsewhere.
 	dp.CLIConfigDirFunc = dp.CLIConfigDirType
 	return dp
 }

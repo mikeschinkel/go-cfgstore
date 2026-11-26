@@ -157,25 +157,25 @@ func NewConfigStore(dirType DirType, args ConfigStoreArgs) ConfigStore {
 	}
 }
 
-// CLIConfigDirType returns the absolute of either ~/.config/ or XDG_CONFIG_HOME on Linux
+// CLIConfigDirType returns the parent of a CLI app's config dir: the user config
+// dir on Linux ($XDG_CONFIG_HOME, or ~/.config), and ~/.config on every other OS.
 func (dp *DirsProvider) CLIConfigDirType() (dir dt.DirPath, err error) {
 	switch runtime.GOOS {
 	case "linux":
-		// Linux defaults to "~/.config" but we want to always support XDG_CONFIG_HOME
+		// The user config dir is already $XDG_CONFIG_HOME or ~/.config.
 		dir, err = dp.UserConfigDirFunc()
 		if err != nil {
 			err = NewErr(ErrFailedGettingUserConfigDir, err)
-			goto end
 		}
 	default:
-		// For macOS and Win always wwant "~/.config" for CLI usage
+		// macOS and Windows put CLI config in ~/.config, not the OS's app config dir.
 		dir, err = dp.UserHomeDirFunc()
 		if err != nil {
 			err = NewErr(ErrFailedGettingUserHomeDir, err)
 			goto end
 		}
+		dir = dt.DirPathJoin(dir, DotConfigPathSegment)
 	}
-	dir = dt.DirPathJoin(dir, DotConfigPathSegment)
 end:
 	return dir, err
 }

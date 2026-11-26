@@ -1,0 +1,38 @@
+# Verification suite for E-2671 — the Linux CLI config dir and its OS-specific test.
+# DO NOT EDIT unless you ARE E-2671. See .endless/tasks/CLAUDE.md.
+#
+# P1 (Linux) and P5 are proven by the Test workflow on ubuntu-latest after the
+# land; this suite runs on the verifier's OS.
+
+schema = 1
+task   = "E-2671"
+
+# P1/P2/P4: the test module, including TestCLIConfigDir_PerOS, fail-fast.
+[[check]]
+name   = "test module unit tests"
+runner = "gotest"
+dir    = "test"
+paths  = ["./..."]
+
+# P3: the example's TestRun takes its CLI line from cfgstore.CLIConfigDir.
+[[check]]
+name   = "P3: examples/comprehensive tests"
+runner = "gotest"
+dir    = "examples/comprehensive"
+paths  = ["./..."]
+
+[[check]]
+name   = "P3: main_test.go hard-codes no CLI config path"
+sh     = "! grep -n 'home/.config' examples/comprehensive/main_test.go"
+equals = ""
+
+# P4: cstest has no hard-coded Users segment.
+[[check]]
+name   = "P4: cstest/dirs_provider.go has no \"Users\" literal in RelConfigDir"
+sh     = "! grep -n '\"Users\"' cstest/dirs_provider.go"
+equals = ""
+
+# The Linux and Windows builds of every touched module vet clean.
+[[check]]
+name = "cross-OS vet (linux, windows)"
+sh   = 'set -e; for m in . test examples/comprehensive; do for os in linux windows; do (cd $m && GOWORK=off GOOS=$os go vet ./...); done; done'

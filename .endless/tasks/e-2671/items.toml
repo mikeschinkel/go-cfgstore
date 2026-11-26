@@ -41,3 +41,8 @@ statement = "Does not read or move a CLI config at the old Linux path <user conf
 id = "P7"
 kind = "exclusion"
 statement = "Does not change the Node 20 action versions in the workflows"
+
+[[item]]
+id = "P8"
+kind = "deliverable"
+statement = "README's CLIConfigDir location says $XDG_CONFIG_HOME/<slug> on Linux when XDG_CONFIG_HOME is set"

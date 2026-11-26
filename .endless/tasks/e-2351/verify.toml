@@ -74,5 +74,5 @@ sh   = 'for m in examples/*/; do (cd "$m" && GOWORK=off go build -o /dev/null ./
 # P6 (exclusion): nothing from the WIP branch's other work came along.
 [[check]]
 name   = "P6: this branch adds no PLAN.md and touches no TruncateLog line"
-sh     = 'base=$(git merge-base main HEAD); git diff --name-only "$base" HEAD -- PLAN.md; git diff "$base" HEAD -- "*.go" | grep -c TruncateLog'
+sh     = 'base=$(git merge-base main HEAD); git diff --name-only "$base" HEAD -- PLAN.md; git diff "$base" HEAD -- "*.go" | grep -c TruncateLog || true'
 equals = "0"

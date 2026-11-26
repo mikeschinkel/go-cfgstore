@@ -59,3 +59,10 @@ statement = "Does not change createLogger's fallback for an unwritable log dir"
 id = "P10"
 kind = "exclusion"
 statement = "Does not change gomion's RunCLI call"
+
+[[item]]
+id = "P11"
+kind = "deliverable"
+statement = "go-cfgstore has a new minor-version tag containing this change, pushed"
+verify = "git ls-remote --tags origin shows the tag on the landed commit"
+post_land = true

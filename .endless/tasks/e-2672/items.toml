@@ -61,3 +61,10 @@ kind = "deliverable"
 statement = "go-cfgstore has a new minor-version tag containing this change, pushed"
 verify = "git ls-remote --tags origin shows the tag on the landed commit"
 post_land = true
+
+[[item]]
+id = "P12"
+kind = "deliverable"
+statement = "When the CLI config logs dir cannot be written, CreateWriterLogger logs under a new temp directory, and prints its 'Logging to ... instead' message only after that directory exists"
+verify = "a test in test/ with an unwritable logs dir finds the log under a new temp dir"
+detail = "Folded in from E-2676: createLogger used dt.CreateTemp, which makes a file, then MkdirAll on its path"

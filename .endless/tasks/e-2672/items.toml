@@ -51,11 +51,6 @@ statement = "examples/comprehensive and the tests in test/ use the new fields an
 verify = "go test ./... in test/ and go build ./... in examples/comprehensive"
 
 [[item]]
-id = "P9"
-kind = "exclusion"
-statement = "Does not change createLogger's fallback for an unwritable log dir"
-
-[[item]]
 id = "P10"
 kind = "exclusion"
 statement = "Does not change gomion's RunCLI call"

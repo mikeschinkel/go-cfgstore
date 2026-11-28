@@ -6,4 +6,6 @@ Planned with Mike from the E-2628 session, 2026-11-25.
 
 **DirsProvider.** Without one, the log lands in the real user config dir and TruncateLog empties it, so an in-process gomion test would wipe gomion's real log. Mike, 2026-11-24: optional.
 
-**Not here.** createLogger's fallback for an unwritable log dir creates a temp file and then uses its path as a directory; E-2676 fixes it.
+**Fallback for an unwritable log dir.** createLogger creates a temp file and then uses its path as a directory. Folded in from E-2676 on 2026-11-27 (P12), since the fix is a few lines in the code this task already changes.
+
+

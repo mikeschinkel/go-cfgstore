@@ -20,3 +20,18 @@ sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
 name = "P8: examples/comprehensive builds and its test passes"
 dir  = "examples/comprehensive"
 sh   = "GOWORK=off go build -o /dev/null . && GOWORK=off go test -count=1 ./..."
+
+# P11 (post-land): release.sh parses, and its escaping survives release.yml's echo.
+[[check]]
+name = "release.sh: bash -n parses it"
+sh   = "bash -n \"$ENDLESS_VERIFY_DIR\"/release.sh"
+
+[[check]]
+name   = "release.sh: the escaped description echoes back unchanged"
+sh     = "f=\"$ENDLESS_VERIFY_DIR\"/release.sh; eval \"D=$(sed -n 's/^DESCRIPTION=//p' \"$f\")\"; E=$(printf '%s' \"$D\" | sed 's/[\\\\\"`$]/\\\\&/g'); out=$(bash -c \"echo \\\"$E\\\"\"); [ \"$out\" = \"$D\" ] && echo same"
+equals = "same"
+
+[[check]]
+name   = "release.sh: names E-2672's landed commit, which is on main"
+sh     = "c=$(sed -n 's/^LANDED_COMMIT=\"\\(.*\\)\"$/\\1/p' \"$ENDLESS_VERIFY_DIR\"/release.sh); git merge-base --is-ancestor \"$c\" main && git log -1 --format=%s \"$c\""
+equals = "E-2672: Add optional Writer and DirsProvider to WriterLoggerArgs"

@@ -7,3 +7,5 @@ What prompted it:
 - gomion's in-process test runs the CLI against a temp config dir through a DirsProvider. The log ignores that and, with TruncateLog true, would empty gomion's real log file in the user's config dir.
 
 Mike, 2026-11-24: the DirsProvider must be optional.
+
+Folded in E-2676 (2026-11-27, Mike's call under ED-1550): createLogger's fallback for an unwritable log dir calls dt.CreateTemp(dt.TempDir(), slug+"-*"), which makes a file, then MkdirAll on that path, which fails with 'not a directory'; its 'Logging to ... instead' message prints before the CreateTemp error is checked.

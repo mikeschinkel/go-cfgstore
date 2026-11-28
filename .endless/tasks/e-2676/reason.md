@@ -1,0 +1,1 @@
+Folded into E-2672 (ED-1550): the fix is a few lines in the same createLogger code E-2672 changes.

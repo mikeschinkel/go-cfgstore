@@ -10,11 +10,6 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	// CreateWriterLogger logs under the real ~/.config, so point it at a temp home.
-	home := t.TempDir()
-	t.Setenv("HOME", home)
-	t.Setenv("XDG_CONFIG_HOME", home+"/.config")
-
 	root := dt.DirPath(t.TempDir())
 
 	// The CLI config dir differs by OS, so ask cfgstore for it.
@@ -32,8 +27,12 @@ func TestRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("run: %v\n%s", err, out.String())
 	}
+	logFile := dt.FilepathJoin(dt.DirPathJoin(cliDir, "logs"), "comprehensive.log")
+	if _, err = logFile.Stat(); err != nil {
+		t.Errorf("log file not under the demo root: %v", err)
+	}
 	for _, want := range []string{
-		"writer ready",
+		"Log file:      <root>/" + string(cliRel) + "/logs/comprehensive.log\n",
 		"CLI:           <root>/" + string(cliRel) + "\n",
 		"Project:       <root>/project/.cfgstore-comprehensive",
 		"App:           <root>/appconfig/cfgstore-comprehensive",

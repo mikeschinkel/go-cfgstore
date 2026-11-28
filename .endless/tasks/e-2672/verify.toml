@@ -1,0 +1,22 @@
+# Verification suite for E-2672 — optional Writer and DirsProvider in WriterLoggerArgs.
+# DO NOT EDIT unless you ARE E-2672. See .endless/tasks/CLAUDE.md.
+
+schema = 1
+task   = "E-2672"
+
+# The test module's tests first, fail-fast: P3–P7 and P12 are TestCreateWriterLogger_*.
+[[check]]
+name    = "test module unit tests"
+runner  = "gotest"
+command = "cd test && GOWORK=off go test -json -race -count=1 ./..."
+
+# P1, P2: the package builds with the new fields.
+[[check]]
+name = "P1, P2: go-cfgstore builds"
+sh   = "GOWORK=off go build ./... && GOWORK=off go vet ./..."
+
+# P8: examples/comprehensive uses the new fields, logs under its DirsProvider, and passes.
+[[check]]
+name = "P8: examples/comprehensive builds and its test passes"
+dir  = "examples/comprehensive"
+sh   = "GOWORK=off go build -o /dev/null . && GOWORK=off go test -count=1 ./..."

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/fs"
 	"log/slog"
-	"os"
 
 	"github.com/mikeschinkel/go-cliutil"
 	"github.com/mikeschinkel/go-dt"
@@ -14,13 +13,26 @@ import (
 var ErrFailedWriterSetup = errors.New("failed writer setup")
 var ErrFailedLoggerSetup = errors.New("failed logger setup")
 
+// ErrWriterAndIO reports a WriterLoggerArgs with both Writer and IO set. A
+// Writer already has its streams, and a cliutil.Writer cannot be given new ones.
+var ErrWriterAndIO = errors.New("writer and IO both provided")
+
+// ErrFailedToCreateTempDir reports a failure creating the temp directory that
+// replaces an unwritable log directory.
+var ErrFailedToCreateTempDir = errors.New("failed to create temp directory")
+
+// WriterLoggerArgs configures CreateWriterLogger. Quiet and Verbosity are
+// pointers because their zero values are real settings: Quiet false prints,
+// and Verbosity 0 is cliutil.NoVerbosity, which prints nothing from Printf.
 type WriterLoggerArgs struct {
-	IO          dt.StdIO
-	Quiet       bool
-	Verbosity   cliutil.Verbosity
-	ConfigSlug  dt.PathSegment
-	LogFile     dt.RelFilepath
-	TruncateLog bool // Remove the log file before the logger opens it, so the log starts empty.
+	Writer       cliutil.Writer     // Optional; nil means build one from IO, Quiet and Verbosity.
+	IO           dt.StdIO           // Optional; nil means not provided. Must be nil when Writer is set.
+	Quiet        *bool              // Optional; nil means not provided.
+	Verbosity    *cliutil.Verbosity // Optional; nil means not provided.
+	DirsProvider *DirsProvider      // Optional; nil means DefaultDirsProvider().
+	ConfigSlug   dt.PathSegment
+	LogFile      dt.RelFilepath
+	TruncateLog  bool // Remove the log file before the logger opens it, so the log starts empty.
 }
 
 func CreateWriterLogger(args *WriterLoggerArgs) (wr cliutil.WriterLogger, err error) {
@@ -28,13 +40,14 @@ func CreateWriterLogger(args *WriterLoggerArgs) (wr cliutil.WriterLogger, err er
 	var logger *slog.Logger
 	var logDir dt.DirPath
 
-	writer := cliutil.NewWriter(&cliutil.WriterArgs{
-		IO:        args.IO,
-		Quiet:     args.Quiet,
-		Verbosity: args.Verbosity,
-	})
+	var writer cliutil.Writer
 
-	configDir, err = CLIConfigDir(args.ConfigSlug)
+	writer, err = newWriter(args)
+	if err != nil {
+		goto end
+	}
+
+	configDir, err = CLIConfigDir(args.ConfigSlug, args.DirsProvider)
 	if err != nil {
 		err = dt.NewErr(
 			ErrFailedWriterSetup,
@@ -59,22 +72,54 @@ end:
 	return wr, err
 }
 
+// newWriter returns args.Writer with any provided Quiet and Verbosity applied,
+// or, with no Writer, a new one over args.IO. A nil Quiet builds a Writer that
+// prints, and a nil Verbosity builds one at cliutil.LowVerbosity, the
+// --verbosity default.
+func newWriter(args *WriterLoggerArgs) (w cliutil.Writer, err error) {
+	if args.Writer == nil {
+		wa := &cliutil.WriterArgs{
+			IO:        args.IO,
+			Verbosity: cliutil.LowVerbosity,
+		}
+		if args.Quiet != nil {
+			wa.Quiet = *args.Quiet
+		}
+		if args.Verbosity != nil {
+			wa.Verbosity = *args.Verbosity
+		}
+		w = cliutil.NewWriter(wa)
+		goto end
+	}
+	if args.IO != nil {
+		err = dt.NewErr(ErrFailedWriterSetup, ErrWriterAndIO)
+		goto end
+	}
+	w = args.Writer
+	if args.Quiet != nil {
+		w = w.WithQuiet(*args.Quiet)
+	}
+	if args.Verbosity != nil {
+		w = w.WithVerbosity(*args.Verbosity)
+	}
+end:
+	return w, err
+}
+
 func createLogger(logDir dt.DirPath, writer cliutil.Writer, args *WriterLoggerArgs) (logger *slog.Logger, err error) {
-	var tmpFile *os.File
 	var canWrite bool
 	var fp dt.Filepath
+	var tmpDir dt.DirPath
 
 	canWrite, _ = logDir.CanWrite()
 	if !canWrite {
-		tmpDir := dt.TempDir()
-		tmpFile, err = dt.CreateTemp(tmpDir, string(args.ConfigSlug)+"-*")
-		writer.Errorf("Cannot write to %s. Logging to %s/%s-* instead\n", logDir, tmpDir, args.ConfigSlug)
+		tmpDir, err = dt.MkdirTemp(dt.TempDir(), string(args.ConfigSlug)+"-*")
 		if err != nil {
-			err = dt.NewErr(dt.ErrFailedtoCreateTempFile, err)
+			err = dt.NewErr(ErrFailedToCreateTempDir, err)
 			goto end
 		}
-		defer dt.CloseOrLog(tmpFile)
-		logDir = dt.DirPath(tmpFile.Name())
+		writer.Errorf("Cannot write to %s. Logging to %s instead\n", logDir, tmpDir)
+		logDir = tmpDir
 	}
 	err = logDir.MkdirAll(0755)
 	if err != nil {

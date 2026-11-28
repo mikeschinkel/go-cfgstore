@@ -1,7 +1,7 @@
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/mikeschinkel/go-cliutil v0.6.0 h1:Zmus2b841sNCPbyseVT9CDa0lCUyn0fxbzLtz5RxFVk=
-github.com/mikeschinkel/go-cliutil v0.6.0/go.mod h1:XUBrRtM6il+4HGWJpsQaQdZx2RXrA/vCYSruVCFQvG8=
+github.com/mikeschinkel/go-cliutil v0.7.0 h1:Q1uxuPBsjlEhp9E6rynpSAx64DHbDyB1I8pe63QRvHs=
+github.com/mikeschinkel/go-cliutil v0.7.0/go.mod h1:XUBrRtM6il+4HGWJpsQaQdZx2RXrA/vCYSruVCFQvG8=
 github.com/mikeschinkel/go-dt v0.7.2 h1:LBXht70qQ9ZcfBxl27PCCGcnImrYEMlDv/smAW7DtfU=
 github.com/mikeschinkel/go-dt v0.7.2/go.mod h1:qyJVqkNO1uNSXs7S7X+ZaG8ErT5Hp33iuN0K8/rwjcU=
 github.com/mikeschinkel/go-dt/appinfo v0.4.0 h1:ywb0jKGLXPnYRYxsO2dHSvDa8ZEHSXPQJxVgx1nSEAw=

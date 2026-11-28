@@ -147,17 +147,24 @@ func (d *demo) show(label string, p string) {
 // and registers the logger with cfgstore.SetLogger.
 func (d *demo) writerLogger() (err error) {
 	var wl cliutil.WriterLogger
+	var dir dt.DirPath
+	verbosity := cliutil.LowVerbosity
 	wl, err = cfgstore.CreateWriterLogger(&cfgstore.WriterLoggerArgs{
-		IO:          dt.NewStdIO(d.w, d.w),
-		Verbosity:   cliutil.LowVerbosity,
-		ConfigSlug:  configSlug,
-		LogFile:     "comprehensive.log",
-		TruncateLog: true,
+		IO:           dt.NewStdIO(d.w, d.w),
+		Verbosity:    &verbosity,
+		DirsProvider: d.dp,
+		ConfigSlug:   configSlug,
+		LogFile:      "comprehensive.log",
+		TruncateLog:  true,
 	})
 	if err != nil {
 		goto end
 	}
-	wl.Printf("writer ready; logging to ~/.config/%s/logs/comprehensive.log\n", configSlug)
+	dir, err = cfgstore.CLIConfigDir(configSlug, d.dp)
+	if err != nil {
+		goto end
+	}
+	d.show("Log file", string(dt.FilepathJoin(dt.DirPathJoin(dir, "logs"), "comprehensive.log")))
 	wl.Info("comprehensive example started")
 end:
 	return err
